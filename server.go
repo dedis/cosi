@@ -31,7 +31,6 @@ import (
 
 func runServer(ctx *cli.Context) {
 	// first check the options
-	dbg.SetDebugVisible(ctx.Int("debug"))
 	config := ctx.String("config")
 
 	if _, err := os.Stat(config); os.IsNotExist(err) {
