@@ -49,7 +49,7 @@ func main() {
 	binaryFlags := []cli.Flag{
 		cli.IntFlag{
 			Name:  "debug, d",
-			Value: 1,
+			Value: 0,
 			Usage: "debug-level: 1 for terse, 5 for maximal",
 		},
 	}
@@ -126,7 +126,7 @@ func main() {
 						if c.String(optionConfig) != "" {
 							stderrExit("[-] Configuration file option can't be used for the 'setup' command")
 						}
-						if c.String("debug") != "" {
+						if c.GlobalIsSet("debug") {
 							stderrExit("[-] Debug option can't be used for the 'setup' command")
 						}
 						interactiveConfig()
