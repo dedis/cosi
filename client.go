@@ -27,7 +27,7 @@ import (
 // checkConfig contacts all servers and verifies if it receives a valid
 // signature from each.
 func checkConfig(c *cli.Context) error {
-	tomlFileName := c.GlobalString(optionGroup)
+	tomlFileName := c.String(optionGroup)
 	f, err := os.Open(tomlFileName)
 	printErrAndExit("Couldn't open group definition file: %v", err)
 	el, err := config.ReadGroupToml(f)
@@ -39,12 +39,6 @@ func checkConfig(c *cli.Context) error {
 	var wg sync.WaitGroup
 	// quick and dirty way to sum up the delat for the wait group:
 	wg.Add(len(el.List))
-	for i, _ := range el.List {
-		for _, _ = range el.List[i+1:] {
-			// two calls of checkList (see below)
-			wg.Add(2)
-		}
-	}
 	fmt.Print("Will check the availability and responsiveness of the " +
 		"servers forming the group and inform you about possible " +
 		"problems.\nThis make take some time ...")
@@ -56,6 +50,7 @@ func checkConfig(c *cli.Context) error {
 		// Then check pairs of servers
 		for i, first := range el.List {
 			for _, second := range el.List[i+1:] {
+				wg.Add(2)
 				es := []*network.Entity{first, second}
 				go checkList(sda.NewEntityList(es), &wg)
 				es[0], es[1] = es[1], es[0]
@@ -99,7 +94,7 @@ func checkList(list *sda.EntityList, wg *sync.WaitGroup) {
 // it always returns nil as an error
 func signFile(c *cli.Context) error {
 	fileName := c.Args().First()
-	groupToml := c.GlobalString(optionGroup)
+	groupToml := c.String(optionGroup)
 	file, err := os.Open(fileName)
 	if err != nil {
 		printErrAndExit("Couldn't read file to be signed: %v", err)
@@ -125,7 +120,7 @@ func signFile(c *cli.Context) error {
 func verifyFile(c *cli.Context) error {
 	dbg.SetDebugVisible(c.GlobalInt("debug"))
 	sigOrEmpty := c.String("signature")
-	err := verify(c.Args().First(), sigOrEmpty, c.GlobalString(optionGroup))
+	err := verify(c.Args().First(), sigOrEmpty, c.String(optionGroup))
 	verifyPrintResult(err)
 	return nil
 }

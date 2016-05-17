@@ -64,7 +64,7 @@ func main() {
 
 	serverFlags := []cli.Flag{
 		cli.StringFlag{
-			Name:  optionConfig + " ," + optionConfigShort,
+			Name:  optionConfig + ", " + optionConfigShort,
 			Value: getDefaultConfigFile(),
 			Usage: "Configuration file of the server",
 		},
