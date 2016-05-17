@@ -12,6 +12,8 @@ import (
 	"time"
 
 	"fmt"
+	"sync"
+
 	"github.com/dedis/cothority/lib/config"
 	"github.com/dedis/cothority/lib/cosi"
 	"github.com/dedis/cothority/lib/crypto"
@@ -20,13 +22,12 @@ import (
 	"github.com/dedis/cothority/lib/sda"
 	s "github.com/dedis/cothority/services/cosi"
 	"gopkg.in/codegangsta/cli.v1"
-	"sync"
 )
 
 // checkConfig contacts all servers and verifies if it receives a valid
 // signature from each.
 func checkConfig(c *cli.Context) error {
-	tomlFileName := c.GlobalString(cothorityDef)
+	tomlFileName := c.GlobalString(optionGroup)
 	f, err := os.Open(tomlFileName)
 	printErrAndExit("Couldn't open group definition file: %v", err)
 	el, err := config.ReadGroupToml(f)
@@ -98,7 +99,7 @@ func checkList(list *sda.EntityList, wg *sync.WaitGroup) {
 // it always returns nil as an error
 func signFile(c *cli.Context) error {
 	fileName := c.Args().First()
-	groupToml := c.GlobalString(cothorityDef)
+	groupToml := c.GlobalString(optionGroup)
 	file, err := os.Open(fileName)
 	if err != nil {
 		printErrAndExit("Couldn't read file to be signed: %v", err)
@@ -124,7 +125,7 @@ func signFile(c *cli.Context) error {
 func verifyFile(c *cli.Context) error {
 	dbg.SetDebugVisible(c.GlobalInt("debug"))
 	sigOrEmpty := c.String("signature")
-	err := verify(c.Args().First(), sigOrEmpty, c.GlobalString(cothorityDef))
+	err := verify(c.Args().First(), sigOrEmpty, c.GlobalString(optionGroup))
 	verifyPrintResult(err)
 	return nil
 }

@@ -29,10 +29,6 @@ import (
 	"github.com/dedis/crypto/config"
 )
 
-const binName = "cosi"
-const serverConfig = "config.toml"
-const groupDef = "group.toml"
-
 func runServer(ctx *cli.Context) {
 	// first check the options
 	dbg.SetDebugVisible(ctx.Int("debug"))
@@ -63,7 +59,7 @@ func interactiveConfig() {
 	var str = readString(reader)
 	// let's dissect the port / IP
 	var hostStr string
-	var ipProvided bool = true
+	var ipProvided = true
 	var portStr string
 	var serverBinding string
 	splitted := strings.Split(str, ":")
@@ -125,13 +121,13 @@ func interactiveConfig() {
 		reachableAddress = askReachableAddress(reader, portStr)
 	} else {
 		// try  to connect to ipfound:portgiven
-		tryIp := publicAddress
-		fmt.Println("[+] Check if the address", tryIp, " is reachable from Internet...")
-		if err := tryConnect(tryIp); err != nil {
+		tryIP := publicAddress
+		fmt.Println("[+] Check if the address", tryIP, " is reachable from Internet...")
+		if err := tryConnect(tryIP); err != nil {
 			stderr("[-] Could not connect to your public IP")
 			reachableAddress = askReachableAddress(reader, portStr)
 		} else {
-			reachableAddress = tryIp
+			reachableAddress = tryIP
 			fmt.Println("[+] Address", reachableAddress, " publicly available from Internet!")
 		}
 	}
@@ -201,7 +197,7 @@ func interactiveConfig() {
 
 	// group definition part
 	var dirName = path.Dir(configFile)
-	var groupFile = path.Join(dirName, groupDef)
+	var groupFile = path.Join(dirName, DefaultGroupFile)
 	serverToml := c.NewServerToml(network.Suite, kp.Public, reachableAddress)
 	groupToml := c.NewGroupToml(serverToml)
 
@@ -232,15 +228,15 @@ func getDefaultConfigFile() string {
 		if curr, err := os.Getwd(); err != nil {
 			stderrExit("[-] Impossible to get the current directory. %v", err)
 		} else {
-			return path.Join(curr, serverConfig)
+			return path.Join(curr, DefaultServerConfig)
 		}
 	}
 	// let's try to stick to usual OS folders
 	switch runtime.GOOS {
 	case "darwin":
-		return path.Join(u.HomeDir, "Library", binName, serverConfig)
+		return path.Join(u.HomeDir, "Library", BinaryName, DefaultServerConfig)
 	default:
-		return path.Join(u.HomeDir, ".config", binName, serverConfig)
+		return path.Join(u.HomeDir, ".config", BinaryName, DefaultServerConfig)
 		// TODO WIndows ? FreeBSD ?
 	}
 }

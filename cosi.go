@@ -12,12 +12,29 @@ import (
 	"github.com/dedis/cothority/lib/dbg"
 )
 
+// Name of the binary
+const BinaryName = "cosi"
+
+// Version of the binary
+const Version = "0.1"
+
+// DefaultGroupFile is the name of the default file to lookup for group
+// definition
+const DefaultGroupFile = "group.toml"
+
+// DefaultServerConfig is the name of the default file to lookup for server
+// configuration file
+const DefaultServerConfig = "config.toml"
+
+const optionGroup = "group"
+const optionGroupShort = "g"
+
+const optionConfig = "config"
+const optionConfigShort = "c"
+
 // RequestTimeOut defines when the client stops waiting for the CoSi group to
 // reply
 const RequestTimeOut = time.Second * 10
-
-const cothorityDef = "group"
-const version = "0.1"
 
 func init() {
 	dbg.SetDebugVisible(1)
@@ -28,7 +45,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "CoSi app"
 	app.Usage = "Collectively sign a file or verify its signature."
-	app.Version = version
+	app.Version = Version
 	binaryFlags := []cli.Flag{
 		cli.IntFlag{
 			Name:  "debug, d",
@@ -39,15 +56,15 @@ func main() {
 
 	clientFlags := []cli.Flag{
 		cli.StringFlag{
-			Name:  cothorityDef + ", g",
-			Value: "default_group.toml",
+			Name:  optionGroup + ", " + optionGroupShort,
+			Value: DefaultGroupFile,
 			Usage: "CoSi group definition file",
 		},
 	}
 
 	serverFlags := []cli.Flag{
 		cli.StringFlag{
-			Name:  "config, c",
+			Name:  optionConfig + " ," + optionConfigShort,
 			Value: getDefaultConfigFile(),
 			Usage: "Configuration file of the server",
 		},
@@ -106,7 +123,7 @@ func main() {
 					Aliases: []string{"s"},
 					Usage:   "Setup the configuration for the server (interactive)",
 					Action: func(c *cli.Context) error {
-						if c.String("config") != "" {
+						if c.String(optionConfig) != "" {
 							stderrExit("[-] Configuration file option can't be used for the 'setup' command")
 						}
 						if c.String("debug") != "" {
