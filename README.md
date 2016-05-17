@@ -90,7 +90,7 @@ list of our servers running the CoSi server [default_group.toml].
 Once you have a valid group definition, you can sign a file using:
 
 ```bash
-cosi sign file file-to-be-signed
+cosi -g dedis_group.toml sign file file-to-be-signed
 ```
 
 It will create a file `file-to-be-signed.sig` containing the sha256 hash
@@ -98,10 +98,10 @@ of the the file and the signature.
 To verify the signature of a file you write:
   
 ```bash
-cosi verify file file-to-be-signed
+cosi -g dedis_group.toml verify file file-to-be-signed
 ```
 
-By default, cosi will search for default configurations folder and the 
+By default, cosi will search in default configurations folders and the 
 current directory for a file "group.toml". You can give another path to the
 group definition file using the `--group` option:
 
