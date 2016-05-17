@@ -3,11 +3,13 @@
 package main
 
 import (
-	"gopkg.in/codegangsta/cli.v1"
 	"time"
 
-	"github.com/dedis/cothority/lib/dbg"
+	"gopkg.in/codegangsta/cli.v1"
+
 	"os"
+
+	"github.com/dedis/cothority/lib/dbg"
 )
 
 // RequestTimeOut defines when the client stops waiting for the CoSi group to
@@ -24,27 +26,10 @@ func init() {
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "Cosi signer and verifier"
+	app.Name = "CoSi app"
 	app.Usage = "Collectively sign a file or verify its signature."
 	app.Version = version
-	clientFlags := []cli.Flag{
-		cli.StringFlag{
-			Name:  cothorityDef + ", g",
-			Value: "servers.toml",
-			Usage: "Cothority group definition in `FILE.toml`: a list of servers which participate in the collective signing process",
-		},
-		cli.IntFlag{
-			Name:  "debug, d",
-			Value: 0,
-			Usage: "debug-level: `integer`: 1 for terse, 5 for maximal",
-		},
-	}
-	serverFlags := []cli.Flag{
-		cli.StringFlag{
-			Name:  "config, c",
-			Value: getDefaultConfigFile(),
-			Usage: "Configuration file of the server",
-		},
+	binaryFlags := []cli.Flag{
 		cli.IntFlag{
 			Name:  "debug, d",
 			Value: 1,
@@ -52,42 +37,57 @@ func main() {
 		},
 	}
 
+	clientFlags := []cli.Flag{
+		cli.StringFlag{
+			Name:  cothorityDef + ", g",
+			Value: "default_group.toml",
+			Usage: "CoSi group definition file",
+		},
+	}
+
+	serverFlags := []cli.Flag{
+		cli.StringFlag{
+			Name:  "config, c",
+			Value: getDefaultConfigFile(),
+			Usage: "Configuration file of the server",
+		},
+	}
 	app.Commands = []cli.Command{
 		// BEGIN CLIENT ----------
 		{
 			Name:    "sign",
 			Aliases: []string{"s"},
-			Usage: `Collectively sign file and write signature to standard output.
-	If you want to store the the signature in a file instead you can use the -out option explained below.`,
-			Action: signFile,
-			Flags: []cli.Flag{
+			Usage:   "Collectively sign file and write signature to standard output",
+			Action:  signFile,
+			Flags: append(clientFlags, []cli.Flag{
 				cli.StringFlag{
 					Name:  "out, o",
 					Usage: "Write signature to `outfile` instead of standard output",
 				},
-			},
+			}...),
 		},
 		{
 			Name:    "verify",
 			Aliases: []string{"v"},
-			Usage:   "verify collective signature of a file",
+			Usage:   "Verify collective signature of a file.",
 			Action:  verifyFile,
-			Flags: []cli.Flag{
+			Flags: append(clientFlags, []cli.Flag{
 				cli.StringFlag{
 					Name:  "file, f",
-					Usage: "verify signature of `FILE`",
+					Usage: "Verify signature of `FILE`",
 				},
 				cli.StringFlag{
 					Name:  "signature, s",
-					Usage: "use the `SIGNATURE_FILE` containing the signature (instead of reading from standard input)",
+					Usage: "Read signature from `FILE` instead of STDIN",
 				},
-			},
+			}...),
 		},
 		{
 			Name:    "check",
 			Aliases: []string{"c"},
-			Usage:   "check if the servers int the group configuration are up and running",
+			Usage:   "Check if the servers in the group definition are up and running",
 			Action:  checkConfig,
+			Flags:   clientFlags,
 		},
 
 		// CLIENT END ----------
@@ -119,10 +119,9 @@ func main() {
 			},
 		},
 		// SERVER END ----------
-
 	}
 
-	app.Flags = clientFlags
+	app.Flags = binaryFlags
 	app.Before = func(c *cli.Context) error {
 		dbg.SetDebugVisible(c.GlobalInt("debug"))
 		return nil
