@@ -123,7 +123,7 @@ func interactiveConfig() {
 		// try  to connect to ipfound:portgiven
 		tryIP := publicAddress
 		fmt.Println("[+] Check if the address", tryIP, " is reachable from Internet...")
-		if err := tryConnect(tryIP); err != nil {
+		if err := tryConnect(tryIP, serverBinding); err != nil {
 			stderr("[-] Could not connect to your public IP")
 			reachableAddress = askReachableAddress(reader, portStr)
 		} else {
@@ -275,13 +275,15 @@ func askReachableAddress(reader *bufio.Reader, port string) string {
 const whatsMyIP = "http://www.whatsmyip.org/"
 
 // tryConnect will bind to the ip address and ask a internet service to try to
-// connect to it
-func tryConnect(ip string) error {
+// connect to it. binding is the address where we must listen (needed because
+// the reachable address might not be the same as the binding address => NAT, ip
+// rules etc).
+func tryConnect(ip string, binding string) error {
 
 	stopCh := make(chan bool, 1)
 	// let's bind
 	go func() {
-		ln, err := net.Listen("tcp", ip)
+		ln, err := net.Listen("tcp", binding)
 		if err != nil {
 			fmt.Println("[-] Trouble with binding to the address:", err)
 			return
