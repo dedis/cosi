@@ -26,6 +26,13 @@ const DefaultGroupFile = "group.toml"
 // configuration file
 const DefaultServerConfig = "config.toml"
 
+// DefaultPort where to listen; At time of writing, this port is not listed in
+// /etc/services
+const DefaultPort = 6879
+
+// DefaultAddress where to be contacted by other servers
+const DefaultAddress = "127.0.0.1"
+
 const optionGroup = "group"
 const optionGroupShort = "g"
 

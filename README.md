@@ -1,4 +1,4 @@
-# Cosi
+# CoSi
 
 This repository implements a of the collective signing (CoSi) protocol
 which itself builds on Schnorr multi-signatures over elliptic curves. 
@@ -86,9 +86,12 @@ application.
 
 In order to initiate a Collective Signing round, you need to get a list of CoSi
 servers with their public keys and address. We provide you with already with a
-list of our servers running the CoSi server [dedis_group.toml]. However, Cosi
-will by default search for a file "group.toml" in default configuration folders
-and current directory.
+list of our servers running the CoSi server [dedis_group.toml]. However, CoSi
+will by default search for a file "group.toml" in the default configuration folders
+which are `$HOME/.config/cosi/` for Linux systems and `$HOME/Library/cosi/` for
+mac systems. If CoSi did not find anything, the default is to search in the current
+directory.
+
 Once you have a valid group definition, you can sign a file using:
 
 ```bash
