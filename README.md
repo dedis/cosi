@@ -80,12 +80,12 @@ in the CoSi protocol.
 In order to sign messages collectively, you first need to define the set of
 cosigners that will participate.  To do this, you need to prepare a *group definition* 
 file listing the cosigners to use with their public keys and Internet addresses.  
-You may use[our default list of public CoSi
+You may use [our default list of public CoSi
 servers](https://github.com/dedis/cosi/blob/master/dedis_group.toml) if you wish, or define your own.
 
 CoSi will by default search for a file "group.toml" in the default configuration folders
 which are `$HOME/.config/cosi/` for Linux systems and `$HOME/Library/cosi/` for
-mac systems. If CoSi did not find anything, the default is to search in the current
+mac systems. If CoSi did not find anything, the default mechanism is to search in the current
 directory.
 
 Once you have a valid group definition, you can sign a file using:
