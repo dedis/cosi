@@ -54,7 +54,7 @@ func interactiveConfig() {
 	fmt.Println("[+] Welcome ! Let's setup the configuration file for a CoSi server...")
 
 	fmt.Println("[*] We need to know on which [address:]PORT you want your server to listen to.")
-	fmt.Print("    Type <Enter> for default port" + strconv.Itoa(DefaultPort) + ": ")
+	fmt.Print("[*] Type <Enter> for default port " + strconv.Itoa(DefaultPort) + ": ")
 	reader := bufio.NewReader(os.Stdin)
 	var str = readString(reader)
 	// let's dissect the port / IP
@@ -67,6 +67,7 @@ func interactiveConfig() {
 	if str == "" {
 		portStr = strconv.Itoa(DefaultPort)
 		hostStr = "0.0.0.0"
+		ipProvided = false
 	} else if len(splitted) == 1 {
 		// one element provided
 		if _, err := strconv.Atoi(splitted[0]); err != nil {
@@ -124,7 +125,7 @@ func interactiveConfig() {
 	} else {
 		// try  to connect to ipfound:portgiven
 		tryIP := publicAddress
-		fmt.Println("[+] Check if the address", tryIP, " is reachable from Internet...")
+		fmt.Println("[+] Check if the address", tryIP, "is reachable from Internet...")
 		if err := tryConnect(tryIP, serverBinding); err != nil {
 			stderr("[-] Could not connect to your public IP")
 			reachableAddress = askReachableAddress(reader, portStr)
@@ -163,8 +164,8 @@ func interactiveConfig() {
 
 	for !configDone {
 		// get name of config file and write to config file
-		fmt.Println("[*] Enter the name of the directory where to write the configuration files, namely\n    " + DefaultServerConfig + " and " + DefaultGroupFile + ".")
-		fmt.Print("    Type <Enter> to use the defaultFolder [ " + defaultFolder + " ] :")
+		fmt.Println("[*] We need a folder where to write the configuration files: " + DefaultServerConfig + "and " + DefaultGroupFile + ".")
+		fmt.Print("[*] Type <Enter> to use the default folder [ " + defaultFolder + " ] :")
 		configFolder = readString(reader)
 		if configFolder == "" {
 			configFolder = defaultFolder
@@ -180,11 +181,7 @@ func interactiveConfig() {
 			}
 		}
 
-		if checkOverwrite(configFile, reader) {
-			break
-		}
-
-		if checkOverwrite(groupFile, reader) {
+		if checkOverwrite(configFile, reader) && checkOverwrite(groupFile, reader) {
 			break
 		}
 	}
@@ -202,7 +199,7 @@ func interactiveConfig() {
 func checkOverwrite(file string, reader *bufio.Reader) bool {
 	// check if the file exists and ask for override
 	if _, err := os.Stat(file); err == nil {
-		fmt.Println("[*] Configuration file " + file + " already exists. Override ? (y/n) : ")
+		fmt.Print("[*] Configuration file " + file + " already exists. Override ? (y/n) : ")
 		var answer = readString(reader)
 		answer = strings.ToLower(answer)
 		if answer == "y" {
@@ -270,8 +267,8 @@ func readString(reader *bufio.Reader) string {
 }
 
 func askReachableAddress(reader *bufio.Reader, port string) string {
-	fmt.Println("[+] Enter the IP address you would like others cothority servers and client to contact you")
-	fmt.Print("    You can us the default local address " + DefaultAddress + " if you plan to use CoSi in local experiments:")
+	fmt.Println("[*] Enter the IP address you would like others cothority servers and client to contact you.")
+	fmt.Print("[*] Type <Enter> to use the default address [ " + DefaultAddress + " ] if you plan to do local experiments:")
 	ipStr := readString(reader)
 	if ipStr == "" {
 		return DefaultAddress + ":" + port
