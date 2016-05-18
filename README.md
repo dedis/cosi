@@ -105,14 +105,14 @@ cosi sign -g dedis_group.toml -o my_file.sig my_file
 To verify a signature, just type:
   
 ```bash
-cosi verify -g dedis_group.toml -s my_file.sig file-to-be-signed
+cosi verify -g dedis_group.toml -s my_file.sig my_file
 ```
 
 You can pass the signature directly to STDOUT and omit the `-s sig` flag:
 
 ```bash
 # will read the signature from STDIN
-cat my_file.sig | cosi verify -g dedis_group.toml file-to-be-signed
+cat my_file.sig | cosi verify -g dedis_group.toml my_file
 ```
 
 In the current implementation, the witnesses do not validate or check the 
