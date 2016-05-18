@@ -86,27 +86,33 @@ application.
 
 In order to initiate a Collective Signing round, you need to get a list of CoSi
 servers with their public keys and address. We provide you with already with a
-list of our servers running the CoSi server [default_group.toml]. 
+list of our servers running the CoSi server [dedis_group.toml]. However, Cosi
+will by default search for a file "group.toml" in default configuration folders
+and current directory.
 Once you have a valid group definition, you can sign a file using:
 
 ```bash
-cosi -g dedis_group.toml sign file file-to-be-signed
+cosi sign -g dedis_group.toml my_file 
 ```
 
-It will create a file `file-to-be-signed.sig` containing the sha256 hash
-of the the file and the signature.
-To verify the signature of a file you write:
+By default, the signature is written to STDOUT. In order to get the signature
+written to a file, you can either redirect or use the the `-o output` flag:
+
+```base
+cosi sign -g dedis_group.toml -o my_file.sig my_file
+```
+
+To verify a signature, just type:
   
 ```bash
-cosi -g dedis_group.toml verify file file-to-be-signed
+cosi verify -g dedis_group.toml -s my_file.sig file-to-be-signed
 ```
 
-By default, cosi will search in default configurations folders and the 
-current directory for a file "group.toml". You can give another path to the
-group definition file using the `--group` option:
+You can pass the signature directly to STDOUT and omit the `-s sig` flag:
 
 ```bash
-cosi -g my_group.toml sign file my_file
+# will read the signature from STDIN
+cat my_file.sig | cosi verify -g dedis_group.toml file-to-be-signed
 ```
 
 In the current implementation, the witnesses do not validate or check the 

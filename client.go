@@ -39,9 +39,7 @@ func checkConfig(c *cli.Context) error {
 	var wg sync.WaitGroup
 	// quick and dirty way to sum up the delat for the wait group:
 	wg.Add(len(el.List))
-	fmt.Print("Will check the availability and responsiveness of the " +
-		"servers forming the group and inform you about possible " +
-		"problems.\nThis make take some time ...")
+	fmt.Println("[+] Checking the availability and responsiveness of the servers in the group...")
 	// First check all servers individually
 	for i := range el.List {
 		go checkList(sda.NewEntityList(el.List[i:i+1]), &wg)
@@ -75,16 +73,16 @@ func checkList(list *sda.EntityList, wg *sync.WaitGroup) {
 	sig, err := signStatement(strings.NewReader(msg), list)
 	if err != nil {
 		fmt.Fprintln(os.Stderr,
-			fmt.Sprintf("Error '%v' while contacting servers: %s",
+			fmt.Sprintf("[-] Error '%v' while contacting servers: %s",
 				err, serverStr))
 	} else {
 		err := verifySignatureHash([]byte(msg), sig, list)
 		if err != nil {
 			fmt.Println(os.Stderr,
-				fmt.Sprintf("Received signature was invalid: %v",
-					err))
+				fmt.Sprintf("[-] Received signature from %s was invalid: %v",
+					serverStr, err))
 		} else {
-			fmt.Println("Received signature successfully")
+			fmt.Println("[+] Received signature successfully for " + serverStr)
 		}
 	}
 
@@ -128,9 +126,9 @@ func verifyFile(c *cli.Context) error {
 // verifyPrintResult prints out OK or what failed.
 func verifyPrintResult(err error) {
 	if err == nil {
-		fmt.Println("OK: Signature is valid.")
+		fmt.Println("[+] OK: Signature is valid.")
 	} else {
-		fmt.Println("Invalid: Signature verification failed: %v", err)
+		printErrAndExit("Invalid: Signature verification failed: %v", err)
 	}
 }
 
@@ -151,7 +149,7 @@ func writeSigAsJSON(res *s.SignatureResponse, outW io.Writer) {
 
 func printErrAndExit(format string, a ...interface{}) {
 	if len(a) > 0 && a[0] != nil {
-		fmt.Fprintln(os.Stderr, fmt.Sprintf(format, a...))
+		fmt.Fprintln(os.Stderr, "[-] "+fmt.Sprintf(format, a...))
 		os.Exit(1)
 	}
 }
@@ -231,7 +229,7 @@ func verify(fileName, sigFileName, groupToml string) error {
 	dbg.Lvl4("Reading signature")
 	var sigBytes []byte
 	if sigFileName == "" {
-		fmt.Println("Reading signature from standard input ...")
+		fmt.Println("[+] Reading signature from standard input ...")
 		sigBytes, err = ioutil.ReadAll(os.Stdin)
 	} else {
 		sigBytes, err = ioutil.ReadFile(sigFileName)
