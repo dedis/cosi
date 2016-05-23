@@ -120,10 +120,9 @@ func interactiveConfig() {
 		publicAddress = serverBinding
 	}
 
-	var reachableAddress string
 	// Let's directly ask the user for a reachable address
 	if failedPublic {
-		reachableAddress = askReachableAddress(reader, portStr)
+		publicAddress = askReachableAddress(reader, portStr)
 	} else {
 		if isPublicIP(publicAddress) {
 			// try  to connect to ipfound:portgiven
@@ -131,10 +130,10 @@ func interactiveConfig() {
 			fmt.Println("[+] Check if the address", tryIP, "is reachable from Internet...")
 			if err := tryConnect(tryIP, serverBinding); err != nil {
 				stderr("[-] Could not connect to your public IP")
-				reachableAddress = askReachableAddress(reader, portStr)
+				publicAddress = askReachableAddress(reader, portStr)
 			} else {
-				reachableAddress = tryIP
-				fmt.Println("[+] Address", reachableAddress, " publicly available from Internet!")
+				publicAddress = tryIP
+				fmt.Println("[+] Address", publicAddress, " publicly available from Internet!")
 			}
 		}
 	}
@@ -183,7 +182,7 @@ func interactiveConfig() {
 		stderrExit("[-] Impossible to parse public key ? <internal error>")
 	}
 
-	server := c.NewServerToml(network.Suite, public, reachableAddress)
+	server := c.NewServerToml(network.Suite, public, publicAddress)
 	group := c.NewGroupToml(server)
 
 	saveFiles(conf, configFile, group, groupFile)

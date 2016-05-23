@@ -67,7 +67,7 @@ runSrvCfg(){
 }
 
 runSrv(){
-    ./cosi server -d $DBG_SRV -c srv$1/config.toml
+    ./cosi -d $DBG_SRV server -c srv$1/config.toml
 }
 
 build(){

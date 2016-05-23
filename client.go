@@ -265,7 +265,7 @@ func verifySignatureHash(b []byte, sig *s.SignatureResponse, el *sda.EntityList)
 	hashHash, _ := crypto.HashBytes(network.Suite.Hash(), fHash)
 	if !bytes.Equal(hashHash, sig.Sum) {
 		return errors.New("You are trying to verify a signature " +
-			"belongig to another file. (The hash provided by the signature " +
+			"belonging to another file. (The hash provided by the signature " +
 			"doesn't match with the hash of the file.)")
 	}
 	if err := cosi.VerifySignature(network.Suite, publics, fHash, sig.Signature); err != nil {
