@@ -2,7 +2,7 @@ package cosi
 
 import (
 	"github.com/BurntSushi/toml"
-	"gopkg.in/dedis/cothority.v0/lib/cosi"
+	"github.com/dedis/cosi/lib"
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 	"gopkg.in/dedis/cothority.v0/lib/monitor"
 	"gopkg.in/dedis/cothority.v0/lib/network"

@@ -15,7 +15,7 @@ import (
 	"sync"
 
 	"gopkg.in/dedis/cothority.v0/lib/config"
-	"gopkg.in/dedis/cothority.v0/lib/cosi"
+	"github.com/dedis/cosi/lib"
 	"gopkg.in/dedis/cothority.v0/lib/crypto"
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 	"gopkg.in/dedis/cothority.v0/lib/network"
