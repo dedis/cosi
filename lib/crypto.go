@@ -10,10 +10,29 @@ import (
 )
 
 func SecretToSlice(secret abstract.Secret) []byte {
-	secBuff := make([]byte, 32)
-	vBuff := secret.(*nist.Int).V.Bytes()
-	util.Reverse(secBuff[32-len(vBuff):], vBuff)
-	return secBuff
+	i := secret.(*nist.Int)
+	min := 32
+	max := 32
+	act := i.MarshalSize()
+	vSize := len(i.V.Bytes())
+	if vSize < act {
+		act = vSize
+	}
+	pad := act
+	if pad < min {
+		pad = min
+	}
+	if max != 0 && pad > max {
+		panic("Int not representable in max bytes")
+	}
+	buf := make([]byte, pad)
+	util.Reverse(buf[:act], i.V.Bytes())
+	return buf
+	/*secBuff := make([]byte, 32)*/
+	//vBuff := secret.(*nist.Int).V.Bytes()
+	//util.Reverse(secBuff[32-len(vBuff):], vBuff)
+	/*return secBuff*/
+	//return secret.(*nist.Int).LittleEndian(32, 32)
 }
 
 func sliceToSecret(suite abstract.Suite, buffer []byte) abstract.Secret {
@@ -50,4 +69,12 @@ func Ed25519Public(suite abstract.Suite, s abstract.Secret) abstract.Point {
 	secPruned := nist.NewInt(0, modulo)
 	secPruned.SetLittleEndian(pruned[:32])
 	return suite.Point().Mul(nil, secPruned)
+}
+
+func SumPublics(suite abstract.Suite, publics []abstract.Point) abstract.Point {
+	agg := suite.Point().Null()
+	for _, p := range publics {
+		agg = agg.Add(agg, p)
+	}
+	return agg
 }

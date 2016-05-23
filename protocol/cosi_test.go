@@ -11,13 +11,18 @@ import (
 )
 
 func TestCosi(t *testing.T) {
-	defer dbg.AfterTest(t)
+	//defer dbg.AfterTest(t)
 	dbg.TestOutput(testing.Verbose(), 4)
 	for _, nbrHosts := range []int{1, 3, 13} {
 		dbg.Lvl2("Running cosi with", nbrHosts, "hosts")
 		local := sda.NewLocalTest()
 		hosts, el, tree := local.GenBigTree(nbrHosts, nbrHosts, 3, true, true)
 		formatEntityList(local, hosts, el)
+		aggPublic := network.Suite.Point().Null()
+		for _, e := range el.List {
+			aggPublic = aggPublic.Add(aggPublic, e.Public)
+		}
+
 		done := make(chan bool)
 		// create the message we want to sign for this round
 		msg := []byte("Hello World Cosi")
@@ -28,11 +33,11 @@ func TestCosi(t *testing.T) {
 		doneFunc := func(sig []byte) {
 			suite := hosts[0].Suite()
 			publics := el.Publics()
-			/*if err := root.Cosi.VerifyResponses(aggPublic); err != nil {*/
-			//t.Fatal("Error verifying responses", err)
-			/*}*/
+			if err := root.Cosi.VerifyResponses(aggPublic); err != nil {
+				t.Fatal("Error verifying responses", err)
+			}
 			if err := cosi.VerifySignature(suite, publics, msg, sig); err != nil {
-				t.Fatal("error verifying signature:", err)
+				t.Fatal("Error verifying signature:", err)
 			}
 			done <- true
 		}
