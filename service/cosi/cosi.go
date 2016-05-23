@@ -3,11 +3,11 @@ package cosi
 import (
 	"errors"
 
-	libcosi "github.com/dedis/cothority/lib/cosi"
-	"github.com/dedis/cothority/lib/crypto"
-	"github.com/dedis/cothority/lib/dbg"
-	"github.com/dedis/cothority/lib/network"
-	"github.com/dedis/cothority/lib/sda"
+	libcosi "gopkg.in/dedis/cothority.v0/lib/cosi"
+	"gopkg.in/dedis/cothority.v0/lib/crypto"
+	"gopkg.in/dedis/cothority.v0/lib/dbg"
+	"gopkg.in/dedis/cothority.v0/lib/network"
+	"gopkg.in/dedis/cothority.v0/lib/sda"
 	"github.com/dedis/cosi/protocol/cosi"
 	"github.com/dedis/crypto/abstract"
 )

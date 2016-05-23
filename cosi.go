@@ -11,7 +11,7 @@ import (
 
 	"os"
 
-	"github.com/dedis/cothority/lib/dbg"
+	"gopkg.in/dedis/cothority.v0/lib/dbg"
 )
 
 // Name of the binary

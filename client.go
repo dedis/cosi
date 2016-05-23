@@ -14,12 +14,12 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/dedis/cothority/lib/config"
-	"github.com/dedis/cothority/lib/cosi"
-	"github.com/dedis/cothority/lib/crypto"
-	"github.com/dedis/cothority/lib/dbg"
-	"github.com/dedis/cothority/lib/network"
-	"github.com/dedis/cothority/lib/sda"
+	"gopkg.in/dedis/cothority.v0/lib/config"
+	"gopkg.in/dedis/cothority.v0/lib/cosi"
+	"gopkg.in/dedis/cothority.v0/lib/crypto"
+	"gopkg.in/dedis/cothority.v0/lib/dbg"
+	"gopkg.in/dedis/cothority.v0/lib/network"
+	"gopkg.in/dedis/cothority.v0/lib/sda"
 	s "github.com/dedis/cosi/service/cosi"
 	"gopkg.in/codegangsta/cli.v1"
 )
