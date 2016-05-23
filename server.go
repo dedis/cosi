@@ -266,7 +266,7 @@ func getDefaultConfigFile() string {
 	u, err := user.Current()
 	// can't get the user dir, so fallback to current working dir
 	if err != nil {
-		fmt.Print("[-] Could not get your home's directory. Switching back to current dir.")
+		fmt.Print("[-] Could not get your home-directory (", err.Error(), "). Switching back to current dir.\n")
 		if curr, err := os.Getwd(); err != nil {
 			stderrExit("[-] Impossible to get the current directory. %v", err)
 		} else {
