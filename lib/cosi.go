@@ -41,6 +41,7 @@ import (
 	"time"
 
 	"github.com/dedis/crypto/abstract"
+	//own "github.com/nikkolasg/learning/crypto/util"
 )
 
 // Cosi is the struct that implements the basic cosi.
@@ -49,8 +50,6 @@ type Cosi struct {
 	suite abstract.Suite
 	// publics is the list of public keys used for signing
 	publics []abstract.Point
-	// aggPublic is the aggregate public key of participants
-	aggPublic abstract.Point
 	// mask is the mask used to select which signers participated in this round
 	// or not. All code regarding the mask is directly inspired from
 	// github.com/bford/golang-x-crypto/ed25519/cosi code.
@@ -68,6 +67,9 @@ type Cosi struct {
 	commitment abstract.Point
 	// V_hat is the aggregated commit (our own + the children's)
 	aggregateCommitment abstract.Point
+	// globalComitment is the global commit of all participants
+	//passed down in the challenge phase
+	globalCommitment abstract.Point
 	// challenge holds the challenge for this round
 	challenge abstract.Secret
 	// response is our own computed response
@@ -103,10 +105,11 @@ type Commitment struct {
 	ChildrenCommit abstract.Point
 }
 
-// Challenge is the Hash of V^0 || S, where S is the Timestamp
-// and the message
+// Challenge is the Hash of Commit || Publics || Msg
+// Commit is the aggregated global commit
 type Challenge struct {
-	Challenge abstract.Secret
+	Challenge        abstract.Secret
+	GlobalCommitment abstract.Point
 }
 
 // Response holds the actual node's response ri and the
@@ -197,20 +200,23 @@ func (c *Cosi) CreateChallenge(msg []byte) (*Challenge, error) {
 	hash.Write(pb)
 	hash.Write(msg)
 	chalBuff := hash.Sum(nil)
+	// reducing the challenge
 	c.challenge = sliceToSecret(c.suite, chalBuff)
 	c.message = msg
 	/*fmt.Println("Abstract Challenge aggCommit = ", own.Abstract2Hex(c.aggregateCommitment))*/
 	//fmt.Println("Abstract Challenge aggPublic = ", own.Abstract2Hex(c.mask.Aggregate()))
 	//fmt.Println("Abstract Challenge msg = ", hex.EncodeToString(msg))
-	/*fmt.Println("Abstract Challenge k = ", hex.EncodeToString(chalBuff))*/
+	/*fmt.Println("Abstract Challenge k = ", own.Abstract2Hex(c.challenge))*/
 	return &Challenge{
-		Challenge: c.challenge,
+		Challenge:        c.challenge,
+		GlobalCommitment: c.aggregateCommitment,
 	}, nil
 }
 
 // Challenge keeps in memory the Challenge from the message.
 func (c *Cosi) Challenge(ch *Challenge) *Challenge {
 	c.challenge = ch.Challenge
+	c.globalCommitment = ch.GlobalCommitment
 	return ch
 }
 
@@ -253,6 +259,8 @@ func (c *Cosi) Response(responses []*Response) (*Response, error) {
 func (c *Cosi) Signature() []byte {
 	// Sig = R || S || bitmask
 	sigS := SecretToSlice(c.aggregateResponse)
+	/*fmt.Println("Abstract Signature() aggResponse = ", own.Abstract2Hex(c.aggregateResponse))*/
+	/*fmt.Println("Abstract Signature() sigS = ", hex.EncodeToString(sigS))*/
 	//sigS := c.aggregateResponse.(*nist.Int).LittleEndian(32, 32)
 	sigR, err := c.aggregateCommitment.MarshalBinary()
 	if err != nil {
@@ -284,37 +292,38 @@ func (c *Cosi) GetCommitment() abstract.Point {
 // VerifyResponses verifies the response this CoSi has against the aggregated
 // public key the tree is using.
 // Reconstruct the AggCommit
-// XXX TODO Not tested yet
 func (c *Cosi) VerifyResponses(aggregatedPublic abstract.Point) error {
-	return nil
 	/*var aggCommitMarshal []byte*/
 	//var aggPublicMarshal []byte
 	//var err error
-	//if aggCommitMarshal, err = c.aggPublic.MarshalBinary(); err != nil {
+	//if aggCommitMarshal, err = c.mask.Aggregate().MarshalBinary(); err != nil {
 	//return err
-	//} else if aggPublicMarshal, err = c.aggregateCommitment.MarshalBinary(); err != nil {
+	//} else if aggPublicMarshal, err = c.globalCommitment.MarshalBinary(); err != nil {
 	//return err
-	//}
+	/*}*/
+	k := c.challenge
 
-	//hash := sha512.New()
-	//hash.Write(aggCommitMarshal)
-	//hash.Write(aggPublicMarshal)
-	//hash.Write(c.message)
-	//kBuff := hash.Sum(nil)
-	//k := sliceToSecret(c.suite, kBuff)
+	// k * -aggPublic + s * B = k*-A + s*B
+	// from s = k * a + r => s * B = k * a * B + r * B <=> s*B = k*A + r*B
+	// <=> s*B + k*-A = r*B
+	minusPublic := c.suite.Point().Neg(aggregatedPublic)
+	kA := c.suite.Point().Mul(minusPublic, k)
+	sB := c.suite.Point().Mul(nil, c.aggregateResponse)
+	left := c.suite.Point().Add(kA, sB)
 
-	//// k * -aggPublic + s * B = k*-A + s*B
-	//// from s = k * a + r => s * B = k * a * B + r * B <=> s*B = k*A + r*B
-	//// <=> s*B + k*-A = r*B
-	//minusPublic := c.suite.Point().Neg(c.aggPublic)
-	//kA := c.suite.Point().Mul(minusPublic, k)
-	//sB := c.suite.Point().Mul(nil, c.response)
-	//left := c.suite.Point().Add(kA, sB)
+	/*fmt.Println("Abstract VerifyResponse Global AggCommit = ", hex.EncodeToString(aggCommitMarshal))*/
+	//fmt.Println("Abstract VerifyResponse Global AggPublic = ", hex.EncodeToString(aggPublicMarshal))
+	//fmt.Println("Abstract VerifyResponse SubTree AggPublic = ", own.Abstract2Hex(aggregatedPublic))
+	//fmt.Println("Abstract VerifyResponse -(AggPublic) = ", own.Abstract2Hex(minusPublic))
+	//fmt.Println("Abstract VerifyResponse Message = ", hex.EncodeToString(c.message))
+	//fmt.Println("Abstract VerifyResponse k = ", own.Abstract2Hex(k))
+	//fmt.Println("Abstract VerifyResponse sig(S) = ", own.Abstract2Hex(left))
 
-	//if !left.Equal(c.aggregateCommitment) {
-	//return errors.New("recreated commitment is not equal to one given")
-	//}
-	/*return nil*/
+	if !left.Equal(c.aggregateCommitment) {
+		return errors.New("recreated commitment is not equal to one given")
+	}
+
+	return nil
 }
 
 // VerifySignature is the method to call to verify a signature issued by a Cosi
@@ -355,12 +364,13 @@ func VerifySignature(suite abstract.Suite, publics []abstract.Point, message, si
 	//fmt.Println("Abstract Verify -(AggPublic) = ", own.Abstract2Hex(minusPublic))
 	//fmt.Println("Abstract Verify Message = ", hex.EncodeToString(message))
 	//fmt.Println("Abstract Verify k = ", own.Abstract2Hex(k))
-	//fmt.Println("Abstract Verify sig(S) = ", own.Abstract2Hex(sigInt))
+	//fmt.Println("Abstract Verify sig(S) = ", hex.EncodeToString(sigBuff))
+	//fmt.Println("Abstract Verify sig(S)int = ", own.Abstract2Hex(sigInt))
 	//fmt.Println("Abstract Verify sig(R) = ", hex.EncodeToString(aggCommitBuff))
 	//fmt.Println("Abstract Verify checkR = ", own.Abstract2Hex(left))
 
 	if !left.Equal(aggCommit) {
-		return errors.New("recreated commitment is not equal to one given")
+		return errors.New("Signature invalid")
 	}
 
 	return nil
@@ -460,7 +470,6 @@ func (cm *CosiMask) AllEnabled() {
 func (cm *CosiMask) Set(mask []byte) error {
 	if cm.MaskLen() != len(mask) {
 		err := fmt.Errorf("CosiMask.MaskLen() is %d but is given %d bytes)", cm.MaskLen(), len(mask))
-		fmt.Println("err = ", err)
 		return err
 	}
 	masklen := len(mask)
