@@ -43,7 +43,7 @@ func checkConfig(c *cli.Context) error {
 	fmt.Println("[+] Checking the availability and responsiveness of the servers in the group...")
 	// First check all servers individually
 	for i := range el.List {
-		go checkList(sda.NewEntityList(el.List[i:i+1]), &wg)
+		checkList(sda.NewEntityList(el.List[i:i+1]), &wg)
 	}
 	if len(el.List) > 1 {
 		// Then check pairs of servers
@@ -51,9 +51,9 @@ func checkConfig(c *cli.Context) error {
 			for _, second := range el.List[i+1:] {
 				wg.Add(2)
 				es := []*network.Entity{first, second}
-				go checkList(sda.NewEntityList(es), &wg)
+				checkList(sda.NewEntityList(es), &wg)
 				es[0], es[1] = es[1], es[0]
-				go checkList(sda.NewEntityList(es), &wg)
+				checkList(sda.NewEntityList(es), &wg)
 			}
 		}
 	}
