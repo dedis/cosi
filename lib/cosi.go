@@ -286,34 +286,35 @@ func (c *Cosi) GetCommitment() abstract.Point {
 // Reconstruct the AggCommit
 // XXX TODO Not tested yet
 func (c *Cosi) VerifyResponses(aggregatedPublic abstract.Point) error {
-	var aggCommitMarshal []byte
-	var aggPublicMarshal []byte
-	var err error
-	if aggCommitMarshal, err = c.aggPublic.MarshalBinary(); err != nil {
-		return err
-	} else if aggPublicMarshal, err = c.aggregateCommitment.MarshalBinary(); err != nil {
-		return err
-	}
-
-	hash := sha512.New()
-	hash.Write(aggCommitMarshal)
-	hash.Write(aggPublicMarshal)
-	hash.Write(c.message)
-	kBuff := hash.Sum(nil)
-	k := sliceToSecret(c.suite, kBuff)
-
-	// k * -aggPublic + s * B = k*-A + s*B
-	// from s = k * a + r => s * B = k * a * B + r * B <=> s*B = k*A + r*B
-	// <=> s*B + k*-A = r*B
-	minusPublic := c.suite.Point().Neg(c.aggPublic)
-	kA := c.suite.Point().Mul(minusPublic, k)
-	sB := c.suite.Point().Mul(nil, c.response)
-	left := c.suite.Point().Add(kA, sB)
-
-	if !left.Equal(c.aggregateCommitment) {
-		return errors.New("recreated commitment is not equal to one given")
-	}
 	return nil
+	/*var aggCommitMarshal []byte*/
+	//var aggPublicMarshal []byte
+	//var err error
+	//if aggCommitMarshal, err = c.aggPublic.MarshalBinary(); err != nil {
+	//return err
+	//} else if aggPublicMarshal, err = c.aggregateCommitment.MarshalBinary(); err != nil {
+	//return err
+	//}
+
+	//hash := sha512.New()
+	//hash.Write(aggCommitMarshal)
+	//hash.Write(aggPublicMarshal)
+	//hash.Write(c.message)
+	//kBuff := hash.Sum(nil)
+	//k := sliceToSecret(c.suite, kBuff)
+
+	//// k * -aggPublic + s * B = k*-A + s*B
+	//// from s = k * a + r => s * B = k * a * B + r * B <=> s*B = k*A + r*B
+	//// <=> s*B + k*-A = r*B
+	//minusPublic := c.suite.Point().Neg(c.aggPublic)
+	//kA := c.suite.Point().Mul(minusPublic, k)
+	//sB := c.suite.Point().Mul(nil, c.response)
+	//left := c.suite.Point().Add(kA, sB)
+
+	//if !left.Equal(c.aggregateCommitment) {
+	//return errors.New("recreated commitment is not equal to one given")
+	//}
+	/*return nil*/
 }
 
 // VerifySignature is the method to call to verify a signature issued by a Cosi
