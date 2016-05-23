@@ -7,13 +7,13 @@ Description = "Default Dedis Cosi servers"
 
 [[servers]]
   Addresses = ["185.26.156.40:61117"]
-  Public = "zeI9zNx8PzfTtq5p3CdAAEJMq70zGt9/9W6ubhIa4pg="
-  Description = "Ismail’s cosi server ... #bedeutsch"
+  Public = "apIWOKSt6JcOvNnjcVcPCNcaJJh/kPEjkbn2xSW+W+Q="
+  Description = "Ismail's server"
 
 [[servers]]
   Addresses = ["78.46.227.60:2000"]
-  Public = "3LI/MDrf0T217nBzA29humeiEJM1wSipO/hBoft7e0k="
-  Description = "Ineiti's Cothority Server"
+  Public = "sWhBLrvgwDBwb4gsvQEqp38o1xXEuko5rjy8AqrlNWg="
+  Description = "Ineiti's server"
 
 [[servers]]
   Addresses = ["95.143.172.241:62306"]
