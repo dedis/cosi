@@ -20,7 +20,7 @@ import (
 	"github.com/dedis/cothority/lib/dbg"
 	"github.com/dedis/cothority/lib/network"
 	"github.com/dedis/cothority/lib/sda"
-	s "github.com/dedis/cothority/services/cosi"
+	s "github.com/dedis/cosi/service/cosi"
 	"gopkg.in/codegangsta/cli.v1"
 )
 
@@ -37,7 +37,7 @@ func checkConfig(c *cli.Context) error {
 			tomlFileName)
 	}
 	var wg sync.WaitGroup
-	// quick and dirty way to sum up the delat for the wait group:
+	// quick and dirty way to sum up the delta for the wait group:
 	wg.Add(len(el.List))
 	fmt.Println("[+] Checking the availability and responsiveness of the servers in the group...")
 	// First check all servers individually
