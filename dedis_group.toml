@@ -17,6 +17,5 @@ Description = "Default Dedis Cosi servers"
 
 [[servers]]
   Addresses = ["95.143.172.241:62306"]
-  Public = "0vFiBw6KcPAXrmgxbsVhPdR08KCpj1K9i06bejPF144="
-  Description = "Daeinar's Cothority Server"
-
+  Public = "DPciH3z3rGwEMDTaIAV/yExResGBLKhNG2As6tKIDV4="
+  Description = "Daeinar's server"
