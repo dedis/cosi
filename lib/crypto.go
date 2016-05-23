@@ -51,3 +51,11 @@ func Ed25519Public(suite abstract.Suite, s abstract.Secret) abstract.Point {
 	secPruned.SetLittleEndian(pruned[:32])
 	return suite.Point().Mul(nil, secPruned)
 }
+
+func SumPublics(suite abstract.Suite, publics []abstract.Point) abstract.Point {
+	agg := suite.Point().Null()
+	for _, p := range publics {
+		agg = agg.Add(agg, p)
+	}
+	return agg
+}
