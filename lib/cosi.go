@@ -35,14 +35,12 @@ package cosi
 import (
 	cryptoRand "crypto/rand"
 	"crypto/sha512"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
 	"time"
 
 	"github.com/dedis/crypto/abstract"
-	own "github.com/nikkolasg/learning/crypto/util"
 )
 
 // Cosi is the struct that implements the basic cosi.
@@ -201,10 +199,10 @@ func (c *Cosi) CreateChallenge(msg []byte) (*Challenge, error) {
 	chalBuff := hash.Sum(nil)
 	c.challenge = sliceToSecret(c.suite, chalBuff)
 	c.message = msg
-	fmt.Println("Abstract Challenge aggCommit = ", own.Abstract2Hex(c.aggregateCommitment))
-	fmt.Println("Abstract Challenge aggPublic = ", own.Abstract2Hex(c.mask.Aggregate()))
-	fmt.Println("Abstract Challenge msg = ", hex.EncodeToString(msg))
-	fmt.Println("Abstract Challenge k = ", hex.EncodeToString(chalBuff))
+	/*fmt.Println("Abstract Challenge aggCommit = ", own.Abstract2Hex(c.aggregateCommitment))*/
+	//fmt.Println("Abstract Challenge aggPublic = ", own.Abstract2Hex(c.mask.Aggregate()))
+	//fmt.Println("Abstract Challenge msg = ", hex.EncodeToString(msg))
+	/*fmt.Println("Abstract Challenge k = ", hex.EncodeToString(chalBuff))*/
 	return &Challenge{
 		Challenge: c.challenge,
 	}, nil
@@ -227,7 +225,7 @@ func (c *Cosi) CreateResponse() (*Response, error) {
 // Response generates the response from the commitment, challenge and the
 // responses of its children.
 func (c *Cosi) Response(responses []*Response) (*Response, error) {
-	// create your own response
+	// //create your own response
 	if err := c.genResponse(); err != nil {
 		return nil, err
 	}
@@ -351,14 +349,14 @@ func VerifySignature(suite abstract.Suite, publics []abstract.Point, message, si
 	sB := suite.Point().Mul(nil, sigInt)
 	left := suite.Point().Add(kA, sB)
 
-	fmt.Println("Abstract Verify AggCommit = ", hex.EncodeToString(aggCommitBuff))
-	fmt.Println("Abstract Verify AggPublic = ", hex.EncodeToString(aggPublicMarshal))
-	fmt.Println("Abstract Verify -(AggPublic) = ", own.Abstract2Hex(minusPublic))
-	fmt.Println("Abstract Verify Message = ", hex.EncodeToString(message))
-	fmt.Println("Abstract Verify k = ", own.Abstract2Hex(k))
-	fmt.Println("Abstract Verify sig(S) = ", own.Abstract2Hex(sigInt))
-	fmt.Println("Abstract Verify sig(R) = ", hex.EncodeToString(aggCommitBuff))
-	fmt.Println("Abstract Verify checkR = ", own.Abstract2Hex(left))
+	/*fmt.Println("Abstract Verify AggCommit = ", hex.EncodeToString(aggCommitBuff))*/
+	//fmt.Println("Abstract Verify AggPublic = ", hex.EncodeToString(aggPublicMarshal))
+	//fmt.Println("Abstract Verify -(AggPublic) = ", own.Abstract2Hex(minusPublic))
+	//fmt.Println("Abstract Verify Message = ", hex.EncodeToString(message))
+	//fmt.Println("Abstract Verify k = ", own.Abstract2Hex(k))
+	//fmt.Println("Abstract Verify sig(S) = ", own.Abstract2Hex(sigInt))
+	//fmt.Println("Abstract Verify sig(R) = ", hex.EncodeToString(aggCommitBuff))
+	//fmt.Println("Abstract Verify checkR = ", own.Abstract2Hex(left))
 
 	if !left.Equal(aggCommit) {
 		return errors.New("recreated commitment is not equal to one given")
@@ -372,7 +370,7 @@ func VerifySignature(suite abstract.Suite, publics []abstract.Point, message, si
 func (c *Cosi) genCommit(r io.Reader) {
 	var reader = r
 	if r == nil {
-		r = cryptoRand.Reader
+		reader = cryptoRand.Reader
 	}
 	var randomFull [64]byte
 	if _, err := io.ReadFull(reader, randomFull[:]); err != nil {

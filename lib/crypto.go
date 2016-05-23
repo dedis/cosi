@@ -34,7 +34,8 @@ func sliceToPoint(suite abstract.Suite, buffer []byte) abstract.Point {
 // the digest + prune transofrmation
 func Ed25519Public(suite abstract.Suite, s abstract.Secret) abstract.Point {
 	// secret modulo-d
-	secMarshal := s.(*nist.Int).LittleEndian(32, 32)
+	//secMarshal := s.(*nist.Int).LittleEndian(32, 32)
+	secMarshal := SecretToSlice(s)
 	pruned := sha512.Sum512(secMarshal)
 	pruned[0] &= 248
 	pruned[31] &= 127
