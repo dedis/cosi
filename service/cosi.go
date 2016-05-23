@@ -8,7 +8,7 @@ import (
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 	"gopkg.in/dedis/cothority.v0/lib/network"
 	"gopkg.in/dedis/cothority.v0/lib/sda"
-	"github.com/dedis/cosi/protocol/cosi"
+	"github.com/dedis/cosi/protocol"
 	"github.com/dedis/crypto/abstract"
 )
 

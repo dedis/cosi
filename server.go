@@ -24,8 +24,8 @@ import (
 	// Empty imports to have the init-functions called which should
 	// register the protocol
 
-	_ "github.com/dedis/cosi/protocol/cosi"
-	_ "github.com/dedis/cosi/service/cosi"
+	_ "github.com/dedis/cosi/protocol"
+	_ "github.com/dedis/cosi/service"
 	"github.com/dedis/crypto/config"
 )
 

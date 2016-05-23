@@ -20,7 +20,7 @@ import (
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 	"gopkg.in/dedis/cothority.v0/lib/network"
 	"gopkg.in/dedis/cothority.v0/lib/sda"
-	s "github.com/dedis/cosi/service/cosi"
+	s "github.com/dedis/cosi/service"
 	"gopkg.in/codegangsta/cli.v1"
 )
 
