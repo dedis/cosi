@@ -38,7 +38,7 @@ for a in $APPS; do
 done
 cp dedis_group.toml $BUILD
 cp README.md $BUILD
-TAR=cosi-$VERSION.tar.gz
+TAR=binaries-$VERSION.tar.gz
 
 echo "Creating $TAR"
 tar cf $TAR -C $BUILD .

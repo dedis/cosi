@@ -52,7 +52,7 @@ type ProtocolCosi struct {
 	tempResponse []*Response
 	// lock associated
 	tempResponseLock *sync.Mutex
-	DoneCallback     func(chal abstract.Secret, response abstract.Secret)
+	DoneCallback     func(sig []byte)
 
 	// hooks related to the various phase of the protocol.
 	// XXX NOT DEPLOYED YET / NOT IN USE.
@@ -86,8 +86,15 @@ type ChallengeHook func(*Challenge) error
 // ```
 func NewProtocolCosi(node *sda.TreeNodeInstance) (sda.ProtocolInstance, error) {
 	var err error
+	// XXX just need to take care to take the global list of cosigners once we
+	// do the exception stuff
+	publics := make([]abstract.Point, len(node.EntityList().List))
+	for i, e := range node.EntityList().List {
+		publics[i] = e.Public
+	}
+
 	pc := &ProtocolCosi{
-		Cosi:             cosi.NewCosi(node.Suite(), node.Private()),
+		Cosi:             cosi.NewCosi(node.Suite(), node.Private(), publics),
 		TreeNodeInstance: node,
 		done:             make(chan bool),
 		tempCommitLock:   new(sync.Mutex),
@@ -215,7 +222,7 @@ func (pc *ProtocolCosi) handleCommitment(in *Commitment) error {
 	}
 
 	// go to Commit()
-	out := pc.Cosi.Commit(commits)
+	out := pc.Cosi.Commit(nil, commits)
 	secretVar.Add(secretVar, pc.Cosi.GetCommitment())
 	// if we are the root, we need to start the Challenge
 	if pc.IsRoot() {
@@ -247,8 +254,8 @@ func (pc *ProtocolCosi) StartChallenge() error {
 // correct signature for this message using the aggregated public key.
 // This is copied from lib/cosi, so that you don't need to include both lib/cosi
 // and protocols/cosi
-func VerifySignature(suite abstract.Suite, msg []byte, public abstract.Point, challenge, secret abstract.Secret) error {
-	return cosi.VerifySignature(suite, msg, public, challenge, secret)
+func VerifySignature(suite abstract.Suite, publics []abstract.Point, msg, sig []byte) error {
+	return cosi.VerifySignature(suite, publics, msg, sig)
 }
 
 // handleChallenge dispatch the challenge to the round and then dispatch the
@@ -336,7 +343,7 @@ func (pc *ProtocolCosi) Cleanup() {
 	// if callback when finished
 	if pc.DoneCallback != nil {
 		dbg.Lvl3("Calling doneCallback")
-		pc.DoneCallback(pc.Cosi.GetChallenge(), pc.Cosi.GetAggregateResponse())
+		pc.DoneCallback(pc.Cosi.Signature())
 	}
 	close(pc.done)
 	pc.Done()
@@ -369,6 +376,6 @@ func (pc *ProtocolCosi) RegisterChallengeHook(fn ChallengeHook) {
 
 // RegisterDoneCallback allows for handling what should happen when a
 // the protocol is done
-func (pc *ProtocolCosi) RegisterDoneCallback(fn func(chal, resp abstract.Secret)) {
+func (pc *ProtocolCosi) RegisterDoneCallback(fn func(sig []byte)) {
 	pc.DoneCallback = fn
 }

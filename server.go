@@ -24,11 +24,11 @@ import (
 	// Empty imports to have the init-functions called which should
 	// register the protocol
 
-	"regexp"
-
 	_ "github.com/dedis/cosi/protocol"
 	_ "github.com/dedis/cosi/service"
 	"github.com/dedis/crypto/config"
+	"regexp"
+	"github.com/dedis/cosi/lib"
 )
 
 func runServer(ctx *cli.Context) {
@@ -140,20 +140,7 @@ func interactiveConfig() {
 	}
 
 	// create the keys
-	fmt.Println("\n[+] Creation of the ed25519 private and public keys...")
-	kp := config.NewKeyPair(network.Suite)
-	privStr, err := crypto.SecretHex(network.Suite, kp.Secret)
-	if err != nil {
-		stderrExit("[-] Error formating private key to hexadecimal. Abort.")
-	}
-
-	pubStr, err := crypto.PubHex(network.Suite, kp.Public)
-	if err != nil {
-		stderrExit("[-] Could not parse public key. Abort.")
-	}
-
-	fmt.Println("[+] Public key: ", pubStr, "\n")
-
+	privStr, pubStr := createKeyPair()
 	conf := &c.CothoritydConfig{
 		Public:    pubStr,
 		Private:   privStr,
@@ -191,7 +178,12 @@ func interactiveConfig() {
 		}
 	}
 
-	server := c.NewServerToml(network.Suite, kp.Public, reachableAddress)
+	public, err := crypto.ReadPubHex(network.Suite, pubStr)
+	if err != nil {
+		stderrExit("[-] Impossible to parse public key ? <internal error>")
+	}
+
+	server := c.NewServerToml(network.Suite, public, reachableAddress)
 	group := c.NewGroupToml(server)
 
 	saveFiles(conf, configFile, group, groupFile)
@@ -226,6 +218,25 @@ func checkOverwrite(file string, reader *bufio.Reader) bool {
 		}
 	}
 	return true
+}
+
+// createKeyPair returns the private and public key hexadecimal representation
+func createKeyPair() (string, string) {
+	fmt.Println("\n[+] Creation of the ed25519 private and public keys...")
+	kp := config.NewKeyPair(network.Suite)
+	privStr, err := crypto.SecretHex(network.Suite, kp.Secret)
+	if err != nil {
+		stderrExit("[-] Error formating private key to hexadecimal. Abort.")
+	}
+	// use the transformation for ed25519 signatures
+	point := cosi.Ed25519Public(network.Suite, kp.Secret)
+	pubStr, err := crypto.PubHex(network.Suite, point)
+	if err != nil {
+		stderrExit("[-] Could not parse public key. Abort.")
+	}
+
+	fmt.Println("[+] Public key: ", pubStr, "\n")
+	return privStr, pubStr
 }
 
 func saveFiles(conf *c.CothoritydConfig, fileConf string, group *c.GroupToml, fileGroup string) {

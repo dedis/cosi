@@ -5,7 +5,6 @@ import (
 
 	libcosi "github.com/dedis/cosi/lib"
 	"github.com/dedis/cosi/protocol"
-	"github.com/dedis/crypto/abstract"
 	"gopkg.in/dedis/cothority.v0/lib/crypto"
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 	"gopkg.in/dedis/cothority.v0/lib/network"
@@ -45,8 +44,7 @@ var CosiRequestType = network.RegisterMessageType(SignatureRequest{})
 // SignatureResponse is what the Cosi service will reply to clients.
 type SignatureResponse struct {
 	Sum       []byte
-	Challenge abstract.Secret
-	Response  abstract.Secret
+	Signature []byte
 }
 
 // CosiResponseType is the type that is embedded in the Request object for a
@@ -69,10 +67,9 @@ func (cs *Cosi) SignatureRequest(e *network.Entity, req *SignatureRequest) (netw
 		return nil, errors.New("Couldn't hash message: " + err.Error())
 	}
 	response := make(chan *libcosi.Signature)
-	pcosi.RegisterDoneCallback(func(chall abstract.Secret, resp abstract.Secret) {
+	pcosi.RegisterDoneCallback(func(sig []byte) {
 		response <- &libcosi.Signature{
-			Challenge: chall,
-			Response:  resp,
+			Sig: sig,
 		}
 	})
 	dbg.Lvl1("Cosi Service starting up root protocol")
@@ -81,8 +78,7 @@ func (cs *Cosi) SignatureRequest(e *network.Entity, req *SignatureRequest) (netw
 	sig := <-response
 	return &SignatureResponse{
 		Sum:       h,
-		Challenge: sig.Challenge,
-		Response:  sig.Response,
+		Signature: sig.Sig,
 	}, nil
 }
 
