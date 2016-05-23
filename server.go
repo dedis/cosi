@@ -24,6 +24,8 @@ import (
 	// Empty imports to have the init-functions called which should
 	// register the protocol
 
+	"regexp"
+
 	_ "github.com/dedis/cosi/protocol"
 	_ "github.com/dedis/cosi/service"
 	"github.com/dedis/crypto/config"
@@ -123,15 +125,17 @@ func interactiveConfig() {
 	if failedPublic {
 		reachableAddress = askReachableAddress(reader, portStr)
 	} else {
-		// try  to connect to ipfound:portgiven
-		tryIP := publicAddress
-		fmt.Println("[+] Check if the address", tryIP, "is reachable from Internet...")
-		if err := tryConnect(tryIP, serverBinding); err != nil {
-			stderr("[-] Could not connect to your public IP")
-			reachableAddress = askReachableAddress(reader, portStr)
-		} else {
-			reachableAddress = tryIP
-			fmt.Println("[+] Address", reachableAddress, " publicly available from Internet!")
+		if !isPublicIP(publicAddress) {
+			// try  to connect to ipfound:portgiven
+			tryIP := publicAddress
+			fmt.Println("[+] Check if the address", tryIP, "is reachable from Internet...")
+			if err := tryConnect(tryIP, serverBinding); err != nil {
+				stderr("[-] Could not connect to your public IP")
+				reachableAddress = askReachableAddress(reader, portStr)
+			} else {
+				reachableAddress = tryIP
+				fmt.Println("[+] Address", reachableAddress, " publicly available from Internet!")
+			}
 		}
 	}
 
@@ -191,6 +195,16 @@ func interactiveConfig() {
 
 	saveFiles(conf, configFile, group, groupFile)
 	fmt.Println("[+] We're done! Have good time using CoSi :)")
+}
+
+func isPublicIP(ip string) bool {
+	public, err := regexp.MatchString("(^127\\.)|(^10\\.)|"+
+		"(^172\\.1[6-9]\\.)|(^172\\.2[0-9]\\.)|"+
+		"(^172\\.3[0-1]\\.)|(^192\\.168\\.)", ip)
+	if err != nil {
+		dbg.Error(err)
+	}
+	return !public
 }
 
 // Returns true if file exists and user is OK to overwrite, or file dont exists
