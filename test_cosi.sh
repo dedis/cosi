@@ -7,8 +7,8 @@ tails=8
 main(){
     startTest
     build
-    test Build
-    test ServerCfg
+#    test Build
+#    test ServerCfg
     test SignFile
     stopTest
 }
@@ -59,11 +59,11 @@ runCl(){
     D=cl$1/servers.toml
     shift
     echo "Running Client with $D $@"
-    ./cosi -d 3 -g $D $@
+    ./cosi $@ -g $D
 }
 
 runSrvCfg(){
-    echo -e "200$1\n127.0.0.1:200$1\n$(pwd)/srv$1/config.toml\n" | ./cosi server setup > $OUT
+    echo -e "127.0.0.1:200$1\n$(pwd)/srv$1\n" | ./cosi server setup > $OUT
 }
 
 runSrv(){

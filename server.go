@@ -125,7 +125,7 @@ func interactiveConfig() {
 	if failedPublic {
 		reachableAddress = askReachableAddress(reader, portStr)
 	} else {
-		if !isPublicIP(publicAddress) {
+		if isPublicIP(publicAddress) {
 			// try  to connect to ipfound:portgiven
 			tryIP := publicAddress
 			fmt.Println("[+] Check if the address", tryIP, "is reachable from Internet...")
@@ -168,7 +168,8 @@ func interactiveConfig() {
 
 	for !configDone {
 		// get name of config file and write to config file
-		fmt.Println("[*] We need a folder where to write the configuration files: " + DefaultServerConfig + "and " + DefaultGroupFile + ".")
+		fmt.Println("[*] We need a folder where to write the configuration files: " + DefaultServerConfig +
+			" and " + DefaultGroupFile + ".")
 		fmt.Print("[*] Type <Enter> to use the default folder [ " + defaultFolder + " ] :")
 		configFolder = readString(reader)
 		if configFolder == "" {
@@ -224,7 +225,7 @@ func checkOverwrite(file string, reader *bufio.Reader) bool {
 			stderrExit("[-] Could not interpret your response. Abort.")
 		}
 	}
-	return false
+	return true
 }
 
 func saveFiles(conf *c.CothoritydConfig, fileConf string, group *c.GroupToml, fileGroup string) {
