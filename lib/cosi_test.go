@@ -1,4 +1,4 @@
-package lib
+package cosi
 
 import (
 	"bytes"
@@ -292,14 +292,6 @@ func genFinalCosi(nb int, msg []byte) (*Cosi, []*Cosi, error) {
 	root, children := genPostChallengePhaseCosi(nb, msg)
 	var responses []*Response
 
-	for _, ch := range children {
-		// generate the response of each children
-		r, err := ch.CreateResponse()
-		if err != nil {
-			return nil, nil, fmt.Errorf("Error creating response:%v", err)
-		}
-		responses = append(responses, r)
-	}
 	// pass them up to the root
 	_, err := root.Response(responses)
 	if err != nil {

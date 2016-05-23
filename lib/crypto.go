@@ -1,4 +1,4 @@
-package lib
+package cosi
 
 import (
 	"crypto/sha512"

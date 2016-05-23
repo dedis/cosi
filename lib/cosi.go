@@ -30,7 +30,7 @@ individual response ri = vi − cxi, and its partial aggregate
 response rˆi = ri + \sum{j ∈ Cj}{rˆj} . Node i finally passes rˆi
 up to its parent, unless i is the root.
 */
-package lib
+package cosi
 
 import (
 	cryptoRand "crypto/rand"
@@ -122,8 +122,7 @@ type Response struct {
 // be used together with the message and the aggregate public key
 // to verify that it's valid.
 type Signature struct {
-	Challenge abstract.Secret
-	Response  abstract.Secret
+	Sig []byte
 }
 
 // Exception is what a node that does not want to sign should include when
