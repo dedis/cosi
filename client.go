@@ -14,14 +14,14 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/dedis/cothority/lib/config"
-	"github.com/dedis/cothority/lib/cosi"
-	"github.com/dedis/cothority/lib/crypto"
-	"github.com/dedis/cothority/lib/dbg"
-	"github.com/dedis/cothority/lib/network"
-	"github.com/dedis/cothority/lib/sda"
-	s "github.com/dedis/cothority/services/cosi"
+	"github.com/dedis/cosi/lib"
+	s "github.com/dedis/cosi/service"
 	"gopkg.in/codegangsta/cli.v1"
+	"gopkg.in/dedis/cothority.v0/lib/config"
+	"gopkg.in/dedis/cothority.v0/lib/crypto"
+	"gopkg.in/dedis/cothority.v0/lib/dbg"
+	"gopkg.in/dedis/cothority.v0/lib/network"
+	"gopkg.in/dedis/cothority.v0/lib/sda"
 )
 
 // checkConfig contacts all servers and verifies if it receives a valid
@@ -37,7 +37,7 @@ func checkConfig(c *cli.Context) error {
 			tomlFileName)
 	}
 	var wg sync.WaitGroup
-	// quick and dirty way to sum up the delat for the wait group:
+	// quick and dirty way to sum up the delta for the wait group:
 	wg.Add(len(el.List))
 	fmt.Println("[+] Checking the availability and responsiveness of the servers in the group...")
 	// First check all servers individually
