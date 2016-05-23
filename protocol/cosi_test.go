@@ -4,10 +4,10 @@ import (
 	"testing"
 	"time"
 
-	"gopkg.in/dedis/cothority.v0/lib/cosi"
+	"github.com/dedis/cosi/lib"
+	"github.com/dedis/crypto/abstract"
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 	"gopkg.in/dedis/cothority.v0/lib/sda"
-	"github.com/dedis/crypto/abstract"
 )
 
 func TestCosi(t *testing.T) {

@@ -16,16 +16,16 @@ import (
 	"strconv"
 	"strings"
 
+	"gopkg.in/codegangsta/cli.v1"
 	c "gopkg.in/dedis/cothority.v0/lib/config"
 	"gopkg.in/dedis/cothority.v0/lib/crypto"
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 	"gopkg.in/dedis/cothority.v0/lib/network"
-	"gopkg.in/codegangsta/cli.v1"
 	// Empty imports to have the init-functions called which should
 	// register the protocol
 
-	_ "github.com/dedis/cosi/protocol/cosi"
-	_ "github.com/dedis/cosi/service/cosi"
+	_ "github.com/dedis/cosi/protocol"
+	_ "github.com/dedis/cosi/service"
 	"github.com/dedis/crypto/config"
 )
 
