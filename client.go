@@ -14,14 +14,14 @@ import (
 	"fmt"
 	"sync"
 
-	"gopkg.in/dedis/cothority.v0/lib/config"
 	"github.com/dedis/cosi/lib"
+	s "github.com/dedis/cosi/service"
+	"gopkg.in/codegangsta/cli.v1"
+	"gopkg.in/dedis/cothority.v0/lib/config"
 	"gopkg.in/dedis/cothority.v0/lib/crypto"
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 	"gopkg.in/dedis/cothority.v0/lib/network"
 	"gopkg.in/dedis/cothority.v0/lib/sda"
-	s "github.com/dedis/cosi/service"
-	"gopkg.in/codegangsta/cli.v1"
 )
 
 // checkConfig contacts all servers and verifies if it receives a valid

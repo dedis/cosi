@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/dedis/cosi/lib"
+	"github.com/stretchr/testify/assert"
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 	"gopkg.in/dedis/cothority.v0/lib/sda"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestServiceCosi(t *testing.T) {

@@ -3,11 +3,11 @@ package cosi
 import (
 	"github.com/BurntSushi/toml"
 	"github.com/dedis/cosi/lib"
+	"golang.org/x/net/context"
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 	"gopkg.in/dedis/cothority.v0/lib/monitor"
 	"gopkg.in/dedis/cothority.v0/lib/network"
 	"gopkg.in/dedis/cothority.v0/lib/sda"
-	"golang.org/x/net/context"
 )
 
 func init() {
