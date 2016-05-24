@@ -31,7 +31,7 @@ func checkConfig(c *cli.Context) error {
 	tomlFileName := c.String(optionGroup)
 	f, err := os.Open(tomlFileName)
 	printErrAndExit("Couldn't open group definition file: %v", err)
-	el, err := config.ReadGroupToml(f)
+	el, descs, err := config.ReadGroupDescToml(f)
 	printErrAndExit("Error while reading group definition file: %v", err)
 	if len(el.List) == 0 {
 		printErrAndExit("Empty entity or invalid group defintion in: %s",
@@ -43,17 +43,19 @@ func checkConfig(c *cli.Context) error {
 	fmt.Println("[+] Checking the availability and responsiveness of the servers in the group...")
 	// First check all servers individually
 	for i := range el.List {
-		checkList(sda.NewEntityList(el.List[i:i+1]), &wg)
+		checkList(sda.NewEntityList(el.List[i:i+1]), descs[i:i+1], &wg)
 	}
 	if len(el.List) > 1 {
 		// Then check pairs of servers
 		for i, first := range el.List {
-			for _, second := range el.List[i+1:] {
+			for j, second := range el.List[i+1:] {
 				wg.Add(2)
+				desc := []string{descs[i], descs[i + j + 1]}
 				es := []*network.Entity{first, second}
-				checkList(sda.NewEntityList(es), &wg)
+				checkList(sda.NewEntityList(es), desc, &wg)
 				es[0], es[1] = es[1], es[0]
-				checkList(sda.NewEntityList(es), &wg)
+				desc[0], desc[1] = desc[1], desc[0]
+				checkList(sda.NewEntityList(es), desc, &wg)
 			}
 		}
 	}
@@ -63,27 +65,27 @@ func checkConfig(c *cli.Context) error {
 }
 
 // checkList sends a message to the list and waits for the reply
-func checkList(list *sda.EntityList, wg *sync.WaitGroup) {
+func checkList(list *sda.EntityList, descs []string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	serverStr := ""
-	for _, s := range list.List {
-		serverStr += s.Addresses[0] + " "
+	for i, s := range list.List {
+		name := strings.Split(descs[i], " ")[0]
+		serverStr += fmt.Sprintf("%s_%s ", s.Addresses[0], name)
 	}
 	dbg.Lvl3("Sending message to: " + serverStr)
 	msg := "verification"
+	fmt.Print("[+] Checking server(s) ", serverStr, ": ")
 	sig, err := signStatement(strings.NewReader(msg), list)
 	if err != nil {
 		fmt.Fprintln(os.Stderr,
-			fmt.Sprintf("[-] Error '%v' while contacting servers: %s",
-				err, serverStr))
+			fmt.Sprintf("Error '%v'", err))
 	} else {
 		err := verifySignatureHash([]byte(msg), sig, list)
 		if err != nil {
 			fmt.Println(os.Stderr,
-				fmt.Sprintf("[-] Received signature from %s was invalid: %v",
-					serverStr, err))
+				fmt.Sprintf("Invalid signature: %v", err))
 		} else {
-			fmt.Println("[+] Received signature successfully for " + serverStr)
+			fmt.Println("Success")
 		}
 	}
 
