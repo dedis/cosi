@@ -10,8 +10,8 @@ import (
 	// XXX In order to check the compatibility with the bford fork of
 	// golang-x-crypto we do a comparison in the test. Uncomment if you want to
 	// try.
-	/* "github.com/bford/golang-x-crypto/ed25519"*/ //"github.com/bford/golang-x-crypto/ed25519/cosi"
-)
+	/*"github.com/bford/golang-x-crypto/ed25519"*/ //"github.com/bford/golang-x-crypto/ed25519/cosi"
+	/*own "github.com/nikkolasg/learning/crypto/util"*/)
 
 var testSuite = edwards.NewAES128SHA256Ed25519(false)
 
@@ -303,4 +303,4 @@ func genFinalCosi(nb int, msg []byte) (*Cosi, []*Cosi, error) {
 //sig := cosigners.AggregateSignature(aggregateCommit, sigParts)
 //fmt.Println("Ed25519 Sign signature = ", hex.EncodeToString(sig))
 //return sig
-//}
+/*}*/
