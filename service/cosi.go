@@ -9,6 +9,8 @@ import (
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 	"gopkg.in/dedis/cothority.v0/lib/network"
 	"gopkg.in/dedis/cothority.v0/lib/sda"
+	"time"
+	"fmt"
 )
 
 // This file contains all the code to run a CoSi service. It is used to reply to
@@ -72,10 +74,13 @@ func (cs *Cosi) SignatureRequest(e *network.Entity, req *SignatureRequest) (netw
 			Sig: sig,
 		}
 	})
-	dbg.Lvl1("Cosi Service starting up root protocol")
+	dbg.Lvl3("Cosi Service starting up root protocol")
 	go pi.Dispatch()
 	go pi.Start()
 	sig := <-response
+	if dbg.DebugVisible() > 0 {
+		fmt.Printf("%s: Signed a message.\n", time.Now().String())
+	}
 	return &SignatureResponse{
 		Sum:       h,
 		Signature: sig.Sig,
@@ -86,7 +91,7 @@ func (cs *Cosi) SignatureRequest(e *network.Entity, req *SignatureRequest) (netw
 // the one starting the protocol) so it's the Service that will be called to
 // generate the PI on all others node.
 func (cs *Cosi) NewProtocol(tn *sda.TreeNodeInstance, conf *sda.GenericConfig) (sda.ProtocolInstance, error) {
-	dbg.Lvl1("Cosi Service received New Protocol event")
+	dbg.Lvl3("Cosi Service received New Protocol event")
 	pi, err := cosi.NewProtocolCosi(tn)
 	go pi.Dispatch()
 	return pi, err

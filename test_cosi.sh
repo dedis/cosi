@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Set to a non-empty value to print debugging messages
+DBG_RUN=
 . $GOPATH/src/gopkg.in/dedis/cothority.v0/app/libtest.sh
 
 tails=8
@@ -7,15 +9,14 @@ tails=8
 main(){
     startTest
     build
-#    test Build
-#    test ServerCfg
+    test Build
+    test ServerCfg
     test SignFile
     stopTest
 }
 
 testSignFile(){
     setupServers 1
-    echo $OUT
     echo "Running first sign"
     echo "My Test Message File" > foo.txt
     echo "My Second Test Message File" > bar.txt
