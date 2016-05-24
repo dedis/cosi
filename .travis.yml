@@ -3,3 +3,9 @@ language: go
 go:
       - 1.5
       - tip
+
+script:
+      - go test -race -p=1 ./...
+
+notifications:
+      email: false
