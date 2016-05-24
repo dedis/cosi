@@ -18,7 +18,7 @@ software distribution and update services,
 directory services used by tools such as [Tor](https://www.torproject.org),
 and next-generation cryptocurrencies.
 For further background and technical details see this research paper:
-> [Keeping Authorities "Honest or Bust" with Decentralized Witness Cosigning](http://dedis.cs.yale.edu/dissent/papers/witness-abs), [IEEE Security & Privacy 2016](http://www.ieee-security.org/TC/SP2016/).
+* [Keeping Authorities "Honest or Bust" with Decentralized Witness Cosigning](http://dedis.cs.yale.edu/dissent/papers/witness-abs), [IEEE Security & Privacy 2016](http://www.ieee-security.org/TC/SP2016/).
 
 For questions and discussions please join the
 [mailing list](https://groups.google.com/forum/#!forum/cothority).
@@ -46,12 +46,14 @@ for Linux and Mac OS X.
 [Download the latest release](https://github.com/dedis/cosi/releases),
 untar it, and move the appropriate binary for your platform
 into a directory that is in your `$PATH`.
-For example:
+The 'cosi'-script choses the correct binary for you.
+If your `~/bin` is in the `$PATH`, you can do:
 
 ```bash
-tar xf cosi-*tar.gz
-mv cosi-linux-amd64 ~/bin/
+tar xf cosi-*tar.gz -C ~/bin
 ```
+
+Now you can go on directly to *Command-line Interface*
 
 ## Installing from source
 
@@ -62,6 +64,7 @@ See
 on how to install and configure Go,
 and make sure that
 [`$GOPATH` and `$GOBIN` are set](https://golang.org/doc/code.html#GOPATH).
+Then you can fetch, update, compile and install the cosi-binary using:
 
 ```bash
 go get -u github.com/dedis/cosi
@@ -71,15 +74,15 @@ The `cosi` binary will be installed in the directory indicated by `$GOBIN`.
 
 # Command-line Interface
 
-The `cosi` application provides both a client application for signing messages,
-and a server application implementing the cosigner or witness-server role
+The `cosi` application provides both a client for signing messages,
+and a server implementing the cosigner or witness-server role
 in the CoSi protocol.
 
 ## Collectively signing messages with the CoSi client
 
 In order to sign messages collectively, you first need to define the set of
 cosigners that will participate.  To do this, you need to prepare a *group definition* 
-file listing the cosigners to use with their public keys and Internet addresses.  
+file which lists the cosigners to use with their public keys and Internet addresses.
 You may use [our default list of public CoSi
 servers](https://github.com/dedis/cosi/blob/master/dedis_group.toml) if you wish, or define your own.
 
@@ -146,14 +149,21 @@ cosi server
 
 The server will try to read the default configuration file; if you have put the
 file in a custom location, provide the path using:
-```base
+```bash
 cosi server -config path/file.toml
-``` 
+```
+
+You can also ask the server to print out some debugging messages by indicating
+a level. Using level 1 shows when a message gets signed:
+
+```bash
+cosi -d 1 server
+```
 
 ### Creating a collective signing group
 
 If you run several CoSi servers,
-you can concatenate their individual `group.toml' outputs
+you can concatenate their individual `group.toml` outputs
 to define your own cosigning group.
 You may optionally use any or all of our experimental
 [default CoSi servers](https://github.com/dedis/cosi/blob/master/dedis_group.toml)
@@ -184,7 +194,7 @@ e.g., 2000 and 2001 in the example above.
 
 You may use the `cosi check` command to
 verify the availability and operation
-of the servers listed in a group definition definition file:
+of the servers listed in a group definition file:
 
 ```bash
 cosi check -g group.toml
@@ -195,4 +205,3 @@ group of all possible pairs of servers.
 If there are connectivity problems,
 due to firewalls or bad connections for example,
 you will see a "Timeout on signing" or similar error message.
-
