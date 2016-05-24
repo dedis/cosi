@@ -205,3 +205,14 @@ group of all possible pairs of servers.
 If there are connectivity problems,
 due to firewalls or bad connections for example,
 you will see a "Timeout on signing" or similar error message.
+
+
+# Standalone Language-specific Verification/Signing Modules
+
+The CoSi client and server software implemented in this repository is intended to provide a scalable, robust distributed protocol for generating collective signatures - but you do not always need a full distributed protocol to work with CoSi signatures.  In particular, applications that wish to accept and rely on CoSi signatures as part of some other protocol - e.g., a software update daemon or certificate checking library - will typically need only a small signature verification module, preferably written in (or with bindings for) the language the relying application is written in.
+
+Following is a list of pointers to standalone language-specific CoSi signature verification modules available for use in applications this way, typically implemented as an extension of an existing ed25519 implementation for that language.  Pointers to more such standalone modules will be added for other languages as we or others create them.  Some of these standalone modules also include (limited) CoSi signature creation support.  We hope that eventually some or all of these CoSi signature handling extensions will be merged back into the base crypto libraries they were derived from.  Note that the repositories below are experimental, likely to change, and may disappear if/when they get successfully upstreamed.
+
+* C language, signature verification only: in [temporary fork of libsodium](https://github.com/bford/libsodium).  See the new `crypto_sign_ed25519_verify_cosi` function in the [crypto_sign/ed25519/ref10](https://github.com/bford/libsodium/blob/master/src/libsodium/crypto_sign/ed25519/ref10/open.c) module, and the test suites for CoSi signature verification in [libsodium/test/default/sign.c](https://github.com/bford/libsodium/blob/master/test/default/sign.c).  Run `make check` as usual for libsodium to run all tests including these.
+
+* Go language, verification and signing code: in [temporary fork of golang.org/x/crypto](https://github.com/bford/golang-x-crypto).  See the new [ed25519/cosi] package, with [extensive godoc API documentation here](https://godoc.org/github.com/bford/golang-x-crypto/ed25519/cosi).  Run `go test` to run the standard test suite, and `go test -bench=.` to run a suite of performance benchmarks for this package.
