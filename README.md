@@ -78,6 +78,23 @@ The `cosi` application provides both a client for signing messages,
 and a server implementing the cosigner or witness-server role
 in the CoSi protocol.
 
+## Chose the right directory for the examples
+
+For the examples in the following sections, we suppose you're in a directory
+where you can find the following files: `README.md` and `dedis-group.toml`.
+
+If you compiled from source, please change the directory like so:
+
+```bash
+cd $GOPATH/src/github.com/dedis/cosi
+```
+
+If you used the binary distribution, please use
+
+```bash
+cd $( dirname $( which cosi ) )
+```
+
 ## Collectively signing messages with the CoSi client
 
 In order to sign messages collectively, you first need to define the set of
@@ -91,10 +108,12 @@ which are `$HOME/.config/cosi/` for Linux systems and `$HOME/Library/cosi/` for
 mac systems. If CoSi did not find anything, the default mechanism is to search in the current
 directory.
 
-Once you have a valid group definition, you can sign a file using:
+Once you have a valid group definition, you can sign a file using the `cosi sign’
+command.  Here is an example that uses our default public CoSi server group to
+sign the README.md file at the top of the cosi source directory:
 
 ```bash
-cosi sign -g dedis_group.toml my_file 
+cosi sign -g dedis_group.toml README.md
 ```
 
 When collective signing completes,
@@ -103,19 +122,19 @@ To write the signature written to a file,
 you may redirect output or use the the `-o` option:
 
 ```base
-cosi sign -g dedis_group.toml -o my_file.sig my_file
+cosi sign -g dedis_group.toml -o README.sig README.md
 ```
 
 To verify a collective signature, use the `cosi verify` command:
   
 ```bash
-cosi verify -g dedis_group.toml -s my_file.sig my_file
+cosi verify -g dedis_group.toml -s README.sig README.md
 ```
 
 Verification can also take the signature from standard input:
 
 ```bash
-cat my_file.sig | cosi verify -g dedis_group.toml my_file
+cat README.sig | cosi verify -g dedis_group.toml README.md
 ```
 
 In the current prototype, CoSi witness servers do not validate or check the 
@@ -147,11 +166,15 @@ To run the server, simply type:
 cosi server
 ```
 
+### Custom configuration path
+
 The server will try to read the default configuration file; if you have put the
 file in a custom location, provide the path using:
 ```bash
 cosi server -config path/file.toml
 ```
+
+### Debugging output
 
 You can also ask the server to print out some debugging messages by indicating
 a level. Using level 1 shows when a message gets signed:
@@ -160,7 +183,7 @@ a level. Using level 1 shows when a message gets signed:
 cosi -d 1 server
 ```
 
-### Creating a collective signing group
+## Creating a collective signing group
 
 If you run several CoSi servers,
 you can concatenate their individual `group.toml` outputs
@@ -190,14 +213,14 @@ If you run multiple servers on the same machine for experimentation,
 they must of course be assigned different ports,
 e.g., 2000 and 2001 in the example above.
  
-### Checking the status of a cosigning group
+## Checking the status of a cosigning group
 
 You may use the `cosi check` command to
 verify the availability and operation
 of the servers listed in a group definition file:
 
 ```bash
-cosi check -g group.toml
+cosi check -g dedis_group.toml
 ```
 
 This will first contact each server individually, then make a small cothority-
@@ -209,10 +232,35 @@ you will see a "Timeout on signing" or similar error message.
 
 # Standalone Language-specific Verification/Signing Modules
 
-The CoSi client and server software implemented in this repository is intended to provide a scalable, robust distributed protocol for generating collective signatures - but you do not always need a full distributed protocol to work with CoSi signatures.  In particular, applications that wish to accept and rely on CoSi signatures as part of some other protocol - e.g., a software update daemon or certificate checking library - will typically need only a small signature verification module, preferably written in (or with bindings for) the language the relying application is written in.
+The CoSi client and server software implemented in this repository is intended
+to provide a scalable, robust distributed protocol for generating collective
+signatures - but you do not always need a full distributed protocol to work
+with CoSi signatures.  In particular, applications that wish to accept and
+rely on CoSi signatures as part of some other protocol - e.g., a software
+update daemon or certificate checking library - will typically need only a
+small signature verification module, preferably written in (or with bindings
+for) the language the relying application is written in.
 
-Following is a list of pointers to standalone language-specific CoSi signature verification modules available for use in applications this way, typically implemented as an extension of an existing ed25519 implementation for that language.  Pointers to more such standalone modules will be added for other languages as we or others create them.  Some of these standalone modules also include (limited) CoSi signature creation support.  We hope that eventually some or all of these CoSi signature handling extensions will be merged back into the base crypto libraries they were derived from.  Note that the repositories below are experimental, likely to change, and may disappear if/when they get successfully upstreamed.
+Following is a list of pointers to standalone language-specific CoSi signature
+verification modules available for use in applications this way, typically
+implemented as an extension of an existing ed25519 implementation for that
+language.  Pointers to more such standalone modules will be added for other
+languages as we or others create them.  Some of these standalone modules also
+include (limited) CoSi signature creation support.  We hope that eventually
+some or all of these CoSi signature handling extensions will be merged back
+into the base crypto libraries they were derived from.  Note that the
+repositories below are experimental, likely to change, and may disappear
+if/when they get successfully upstreamed.
 
-* C language, signature verification only: in [temporary fork of libsodium](https://github.com/bford/libsodium).  See the new `crypto_sign_ed25519_verify_cosi` function in the [crypto_sign/ed25519/ref10](https://github.com/bford/libsodium/blob/master/src/libsodium/crypto_sign/ed25519/ref10/open.c) module, and the test suites for CoSi signature verification in [libsodium/test/default/sign.c](https://github.com/bford/libsodium/blob/master/test/default/sign.c).  Run `make check` as usual for libsodium to run all tests including these.
-
-* Go language, verification and signing code: in [temporary fork of golang.org/x/crypto](https://github.com/bford/golang-x-crypto).  See the new [ed25519/cosi] package, with [extensive godoc API documentation here](https://godoc.org/github.com/bford/golang-x-crypto/ed25519/cosi).  Run `go test` to run the standard test suite, and `go test -bench=.` to run a suite of performance benchmarks for this package.
+* C language, signature verification only: in [temporary fork of libsodium](https://github.com/bford/libsodium).
+See the new `crypto_sign_ed25519_verify_cosi` function in the
+[crypto_sign/ed25519/ref10](https://github.com/bford/libsodium/blob/master/src/libsodium/crypto_sign/ed25519/ref10/open.c)
+module, and the test suites for CoSi signature verification in
+[libsodium/test/default/sign.c](https://github.com/bford/libsodium/blob/master/test/default/sign.c).
+Run `make check` as usual for libsodium to run all tests including these.
+* Go language, verification and signing code: in
+[temporary fork of golang.org/x/crypto](https://github.com/bford/golang-x-crypto).
+See the new [ed25519/cosi] package, with
+[extensive godoc API documentation here](https://godoc.org/github.com/bford/golang-x-crypto/ed25519/cosi).
+Run `go test` to run the standard test suite, and `go test -bench=.` to run a
+suite of performance benchmarks for this package.
