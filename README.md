@@ -43,7 +43,7 @@ as described below.
 
 For convenience we provide self-contained x86-64 binaries
 for Linux and Mac OS X.
-[Download the latest release](https://github.com/dedis/cosi/releases),
+[Download the latest release](https://github.com/dedis/cosi/releases/latest),
 untar it, and move the appropriate binary for your platform
 into a directory that is in your `$PATH`.
 The 'cosi'-script choses the correct binary for you.

@@ -19,3 +19,9 @@ Description = "Default Dedis Cosi servers"
   Addresses = ["95.143.172.241:62306"]
   Public = "DPciH3z3rGwEMDTaIAV/yExResGBLKhNG2As6tKIDV4="
   Description = "Daeinar's server"
+
+[[servers]]
+  Addresses = ["192.33.210.8:6879"]
+  Public = "GDM8DlweNi9RL96mFEtQqM9qBnsm/GCW5SgWD98C2VU="
+  Description = "EPFL CoSi server"
+
