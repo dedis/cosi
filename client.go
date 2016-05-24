@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"fmt"
-	"sync"
 
 	"github.com/dedis/cosi/lib"
 	s "github.com/dedis/cosi/service"
@@ -37,36 +36,30 @@ func checkConfig(c *cli.Context) error {
 		printErrAndExit("Empty entity or invalid group defintion in: %s",
 			tomlFileName)
 	}
-	var wg sync.WaitGroup
-	// quick and dirty way to sum up the delta for the wait group:
-	wg.Add(len(el.List))
 	fmt.Println("[+] Checking the availability and responsiveness of the servers in the group...")
 	// First check all servers individually
 	for i := range el.List {
-		checkList(sda.NewEntityList(el.List[i:i+1]), descs[i:i+1], &wg)
+		checkList(sda.NewEntityList(el.List[i:i+1]), descs[i:i+1])
 	}
 	if len(el.List) > 1 {
 		// Then check pairs of servers
 		for i, first := range el.List {
 			for j, second := range el.List[i+1:] {
-				wg.Add(2)
 				desc := []string{descs[i], descs[i + j + 1]}
 				es := []*network.Entity{first, second}
-				checkList(sda.NewEntityList(es), desc, &wg)
+				checkList(sda.NewEntityList(es), desc)
 				es[0], es[1] = es[1], es[0]
 				desc[0], desc[1] = desc[1], desc[0]
-				checkList(sda.NewEntityList(es), desc, &wg)
+				checkList(sda.NewEntityList(es), desc)
 			}
 		}
 	}
 
-	wg.Wait()
 	return nil
 }
 
 // checkList sends a message to the list and waits for the reply
-func checkList(list *sda.EntityList, descs []string, wg *sync.WaitGroup) {
-	defer wg.Done()
+func checkList(list *sda.EntityList, descs []string) {
 	serverStr := ""
 	for i, s := range list.List {
 		name := strings.Split(descs[i], " ")[0]
