@@ -24,11 +24,12 @@ import (
 	// Empty imports to have the init-functions called which should
 	// register the protocol
 
+	"regexp"
+
+	"github.com/dedis/cosi/lib"
 	_ "github.com/dedis/cosi/protocol"
 	_ "github.com/dedis/cosi/service"
 	"github.com/dedis/crypto/config"
-	"regexp"
-	"github.com/dedis/cosi/lib"
 )
 
 func runServer(ctx *cli.Context) {
