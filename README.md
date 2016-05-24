@@ -39,7 +39,7 @@ You may install CoSi from either pre-built binaries
 or from [Go](https://golang.org/) source code,
 as described below.
 
-## Installing from binaries
+## Installing from Binaries
 
 For convenience we provide self-contained x86-64 binaries
 for Linux and Mac OS X.
@@ -55,7 +55,7 @@ tar xf cosi-*tar.gz -C ~/bin
 
 Now you can go on directly to *Command-line Interface*
 
-## Installing from source
+## Installing from Source
 
 To build and run CoSi from source code you will need to install
 [Go](https://golang.org/) version 1.5.2 or later.
@@ -78,7 +78,7 @@ The `cosi` application provides both a client for signing messages,
 and a server implementing the cosigner or witness-server role
 in the CoSi protocol.
 
-## Chose the right directory for the examples
+## Chose the Right Directory for the Examples
 
 For the examples in the following sections, we suppose you're in a directory
 where you can find the following files: `README.md` and `dedis-group.toml`.
@@ -95,7 +95,7 @@ If you used the binary distribution, please use
 cd $( dirname $( which cosi ) )
 ```
 
-## Collectively signing messages with the CoSi client
+## Collectively Signing Messages with the CoSi Client
 
 In order to sign messages collectively, you first need to define the set of
 cosigners that will participate.  To do this, you need to prepare a *group definition* 
@@ -145,7 +145,7 @@ by which the servers can apply application-specific checks to messages
 before signing off on them,
 e.g., to validate a [collectively signed blockchain](http://arxiv.org/abs/1602.06997).
 
-## Running your own CoSi witness server
+## Running Your Own CoSi Witness Server
 
 First you need to create a configuration file for the server including a 
 public/private key pair.
@@ -166,7 +166,7 @@ To run the server, simply type:
 cosi server
 ```
 
-### Custom configuration path
+### Custom Configuration Path
 
 The server will try to read the default configuration file; if you have put the
 file in a custom location, provide the path using:
@@ -174,7 +174,7 @@ file in a custom location, provide the path using:
 cosi server -config path/file.toml
 ```
 
-### Debugging output
+### Debugging Output
 
 You can also ask the server to print out some debugging messages by indicating
 a level. Using level 1 shows when a message gets signed:
@@ -183,7 +183,7 @@ a level. Using level 1 shows when a message gets signed:
 cosi -d 1 server
 ```
 
-## Creating a collective signing group
+## Creating a Collective Signing Group
 
 If you run several CoSi servers,
 you can concatenate their individual `group.toml` outputs
@@ -213,7 +213,7 @@ If you run multiple servers on the same machine for experimentation,
 they must of course be assigned different ports,
 e.g., 2000 and 2001 in the example above.
  
-## Checking the status of a cosigning group
+## Checking the Status of a Cosigning Group
 
 You may use the `cosi check` command to
 verify the availability and operation
