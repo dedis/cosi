@@ -79,7 +79,7 @@ func (cs *Cosi) SignatureRequest(e *network.Entity, req *SignatureRequest) (netw
 	go pi.Start()
 	sig := <-response
 	if dbg.DebugVisible() > 0 {
-		fmt.Printf("%s: Signed a message.\n", time.Now().String())
+		fmt.Printf("%s: Signed a message.\n", time.Now().Format("Mon Jan 2 15:04:05 -0700 MST 2006"))
 	}
 	return &SignatureResponse{
 		Sum:       h,
