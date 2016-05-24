@@ -45,7 +45,7 @@ func checkConfig(c *cli.Context) error {
 		// Then check pairs of servers
 		for i, first := range el.List {
 			for j, second := range el.List[i+1:] {
-				desc := []string{descs[i], descs[i + j + 1]}
+				desc := []string{descs[i], descs[i+j+1]}
 				es := []*network.Entity{first, second}
 				checkList(sda.NewEntityList(es), desc)
 				es[0], es[1] = es[1], es[0]

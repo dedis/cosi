@@ -3,14 +3,15 @@ package cosi
 import (
 	"errors"
 
+	"fmt"
+	"time"
+
 	libcosi "github.com/dedis/cosi/lib"
 	"github.com/dedis/cosi/protocol"
 	"gopkg.in/dedis/cothority.v0/lib/crypto"
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 	"gopkg.in/dedis/cothority.v0/lib/network"
 	"gopkg.in/dedis/cothority.v0/lib/sda"
-	"time"
-	"fmt"
 )
 
 // This file contains all the code to run a CoSi service. It is used to reply to
