@@ -18,7 +18,7 @@ import (
 const BinaryName = "cosi"
 
 // Version of the binary
-const Version = "0.1.5-alpha"
+const Version = "0.8.2"
 
 // DefaultGroupFile is the name of the default file to lookup for group
 // definition
