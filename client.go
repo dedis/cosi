@@ -219,7 +219,7 @@ func verify(fileName, sigFileName, groupToml string) error {
 	dbg.Lvl4("Reading file " + fileName)
 	b, err := ioutil.ReadFile(fileName)
 	if err != nil {
-		return err
+		return errors.New("Couldn't open signed file: " + err.Error())
 	}
 	// Read the JSON signature file
 	dbg.Lvl4("Reading signature")
