@@ -43,5 +43,5 @@ TAR=binaries-$VERSION.tar.gz
 echo "Creating $TAR"
 tar cf $TAR -C $BUILD .
 
-git tag $VERSION
+git tag -a $VERSION -m "New version $VERSION"
 git push origin $VERSION
