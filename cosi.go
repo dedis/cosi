@@ -93,10 +93,11 @@ func main() {
 			}...),
 		},
 		{
-			Name:    "verify",
-			Aliases: []string{"v"},
-			Usage:   "Verify collective signature of a `FILE`. Signature is read by default from STDIN.",
-			Action:  verifyFile,
+			Name:      "verify",
+			Aliases:   []string{"v"},
+			Usage:     "Verify collective signature of a `FILE`. Signature is read by default from STDIN.",
+			ArgsUsage: "`FILE`",
+			Action:    verifyFile,
 			Flags: append(clientFlags, []cli.Flag{
 				cli.StringFlag{
 					Name:  "signature, s",
