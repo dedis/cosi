@@ -1,36 +1,18 @@
 #!/usr/bin/env bash
 
 # Set to a non-empty value to print debugging messages
-DBG_RUN=1
+DBG_RUN=
 . $GOPATH/src/gopkg.in/dedis/cothority.v0/app/libtest.sh
-STATICDIR=test
 
 tails=8
 
 main(){
     startTest
     build
-    #test Build
-    #test ServerCfg
-    #test SignFile
-    test Reconnect
+    test Build
+    test ServerCfg
+    test SignFile
     stopTest
-}
-
-testReconnect(){
-    setupServers 1
-    dbgRun "Running first sign"
-    echo "My Test Message File" > foo.txt
-    testOK runCl 1 sign foo.txt
-    for s in 1 2; do
-        dbgRun "Killing server $s"
-        pkill -f "c srv$s/config"
-        testFail runCl 1 sign foo.txt
-        dbgRun "Starting server $s again"
-        runSrv $s &
-        sleep 1
-        testOK runCl 1 sign foo.txt
-    done
 }
 
 testSignFile(){
@@ -99,9 +81,7 @@ build(){
     mkdir -p $DIR
     cd $DIR
     echo "Building in $DIR"
-    if [ ! -x cosi ]; then
-        go build -o cosi $BUILDDIR/*go
-    fi
+    go build -o cosi $BUILDDIR/*go
     for n in $(seq $NBR); do
         srv=srv$n
         rm -rf $srv
