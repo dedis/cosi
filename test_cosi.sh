@@ -18,11 +18,11 @@ main(){
 }
 
 testReconnect(){
-    setupServers 1
-    dbgRun "Running first sign"
-    echo "My Test Message File" > foo.txt
-    testOK runCl 1 sign foo.txt
     for s in 1 2; do
+        setupServers 1
+        dbgRun "Running first sign"
+        echo "My Test Message File" > foo.txt
+        testOK runCl 1 sign foo.txt
         dbgRun "Killing server $s"
         pkill -f "c srv$s/config"
         testFail runCl 1 sign foo.txt
@@ -30,6 +30,7 @@ testReconnect(){
         runSrv $s &
         sleep 1
         testOK runCl 1 sign foo.txt
+        pkill -f cosi
     done
 }
 
