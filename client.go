@@ -88,7 +88,7 @@ func checkList(list *sda.EntityList, descs []string) {
 // it always returns nil as an error
 func signFile(c *cli.Context) error {
 	if c.Args().First() == "" {
-		printErrAndExit("Please give the file to sign\n")
+		printErrAndExit("Please give the file to sign", 1)
 	}
 	fileName := c.Args().First()
 	groupToml := c.String(optionGroup)
@@ -116,7 +116,7 @@ func signFile(c *cli.Context) error {
 
 func verifyFile(c *cli.Context) error {
 	if len(c.Args().First()) == 0 {
-		printErrAndExit("Please give the 'msgFile'")
+		printErrAndExit("Please give the 'msgFile'", 1)
 	}
 	dbg.SetDebugVisible(c.GlobalInt("debug"))
 	sigOrEmpty := c.String("signature")
@@ -152,10 +152,8 @@ func writeSigAsJSON(res *s.SignatureResponse, outW io.Writer) {
 func printErrAndExit(format string, a ...interface{}) {
 	if len(a) > 0 && a[0] != nil {
 		fmt.Fprintln(os.Stderr, "[-] "+fmt.Sprintf(format, a...))
-	} else {
-		fmt.Fprintln(os.Stderr, "[-]", format)
+		os.Exit(1)
 	}
-	os.Exit(1)
 }
 
 // sign takes a stream and a toml file defining the servers
