@@ -10,9 +10,10 @@ tails=8
 main(){
     startTest
     build
-    #test Build
-    #test ServerCfg
-    #test SignFile
+    test Build
+    test ServerCfg
+    test SignFile
+    test Check
     test Reconnect
     stopTest
 }
@@ -32,6 +33,11 @@ testReconnect(){
         testOK runCl 1 sign foo.txt
         pkill -f cosi
     done
+}
+
+testCheck(){
+    setupServers 1
+    testOK runCl 1 check
 }
 
 testSignFile(){
