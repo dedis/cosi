@@ -116,7 +116,7 @@ func signFile(c *cli.Context) error {
 
 func verifyFile(c *cli.Context) error {
 	if len(c.Args().First()) == 0 {
-		printErrAndExit("Please give the file that has been signed")
+		printErrAndExit("Please give the 'msgFile'")
 	}
 	dbg.SetDebugVisible(c.GlobalInt("debug"))
 	sigOrEmpty := c.String("signature")
@@ -227,7 +227,7 @@ func verify(fileName, sigFileName, groupToml string) error {
 	dbg.Lvl4("Reading file " + fileName)
 	b, err := ioutil.ReadFile(fileName)
 	if err != nil {
-		return errors.New("Couldn't open signed file: " + err.Error())
+		return errors.New("Couldn't open msgFile: " + err.Error())
 	}
 	// Read the JSON signature file
 	dbg.Lvl4("Reading signature")
