@@ -83,25 +83,25 @@ func main() {
 		{
 			Name:    "sign",
 			Aliases: []string{"s"},
-			Usage:   "Collectively sign a `FILE`. The signature is written to STDOUT by default.",
+			Usage:   "Collectively sign a 'msgFile'. The signature is written to STDOUT by default.",
 			Action:  signFile,
 			Flags: append(clientFlags, []cli.Flag{
 				cli.StringFlag{
 					Name:  "out, o",
-					Usage: "Write signature to `outfile` instead of standard output",
+					Usage: "Write signature to 'sig' instead of STDOUT.",
 				},
 			}...),
 		},
 		{
 			Name:      "verify",
 			Aliases:   []string{"v"},
-			Usage:     "Verify collective signature of a `FILE`. Signature is read by default from STDIN.",
-			ArgsUsage: "`FILE`",
+			Usage:     "Verify collective signature of a 'msgFile'. Signature is read by default from STDIN.",
+			ArgsUsage: "msgFile",
 			Action:    verifyFile,
 			Flags: append(clientFlags, []cli.Flag{
 				cli.StringFlag{
 					Name:  "signature, s",
-					Usage: "Read signature from `FILE` instead of STDIN",
+					Usage: "Read signature from 'sig' instead of STDIN",
 				},
 			}...),
 		},
