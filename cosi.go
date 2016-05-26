@@ -18,7 +18,7 @@ import (
 const BinaryName = "cosi"
 
 // Version of the binary
-const Version = "0.8.2"
+const Version = "0.8.4"
 
 // DefaultGroupFile is the name of the default file to lookup for group
 // definition
@@ -93,10 +93,11 @@ func main() {
 			}...),
 		},
 		{
-			Name:    "verify",
-			Aliases: []string{"v"},
-			Usage:   "Verify collective signature of a `FILE`. Signature is read by default from STDIN.",
-			Action:  verifyFile,
+			Name:      "verify",
+			Aliases:   []string{"v"},
+			Usage:     "Verify collective signature of a `FILE`. Signature is read by default from STDIN.",
+			ArgsUsage: "`FILE`",
+			Action:    verifyFile,
 			Flags: append(clientFlags, []cli.Flag{
 				cli.StringFlag{
 					Name:  "signature, s",

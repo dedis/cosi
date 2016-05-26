@@ -87,6 +87,9 @@ func checkList(list *sda.EntityList, descs []string) {
 // signFile will search for the file and sign it
 // it always returns nil as an error
 func signFile(c *cli.Context) error {
+	if c.Args().First() == "" {
+		printErrAndExit("Please give the file to sign\n")
+	}
 	fileName := c.Args().First()
 	groupToml := c.String(optionGroup)
 	file, err := os.Open(fileName)
@@ -112,6 +115,9 @@ func signFile(c *cli.Context) error {
 }
 
 func verifyFile(c *cli.Context) error {
+	if len(c.Args().First()) == 0 {
+		printErrAndExit("Please give the file that has been signed")
+	}
 	dbg.SetDebugVisible(c.GlobalInt("debug"))
 	sigOrEmpty := c.String("signature")
 	err := verify(c.Args().First(), sigOrEmpty, c.String(optionGroup))
@@ -146,8 +152,10 @@ func writeSigAsJSON(res *s.SignatureResponse, outW io.Writer) {
 func printErrAndExit(format string, a ...interface{}) {
 	if len(a) > 0 && a[0] != nil {
 		fmt.Fprintln(os.Stderr, "[-] "+fmt.Sprintf(format, a...))
-		os.Exit(1)
+	} else {
+		fmt.Fprintln(os.Stderr, "[-]", format)
 	}
+	os.Exit(1)
 }
 
 // sign takes a stream and a toml file defining the servers
@@ -219,7 +227,7 @@ func verify(fileName, sigFileName, groupToml string) error {
 	dbg.Lvl4("Reading file " + fileName)
 	b, err := ioutil.ReadFile(fileName)
 	if err != nil {
-		return err
+		return errors.New("Couldn't open signed file: " + err.Error())
 	}
 	// Read the JSON signature file
 	dbg.Lvl4("Reading signature")
