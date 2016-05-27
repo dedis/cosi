@@ -27,7 +27,6 @@ import (
 // checkConfig contacts all servers and verifies if it receives a valid
 // signature from each.
 func checkConfig(c *cli.Context) error {
-	os.Exit(1)
 	tomlFileName := c.String(optionGroup)
 	f, err := os.Open(tomlFileName)
 	printErrAndExit("Couldn't open group definition file: %v", err)
