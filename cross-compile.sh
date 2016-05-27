@@ -18,6 +18,7 @@ perl -pi -e "s/^(const Version = \").*/\${1}$VERSION\"/" cosi.go
 
 if ! ./test_cosi.sh -q; then
   echo -e "\nTest is failing - not compiling"
+  exit 1
 fi
 
 compile(){
