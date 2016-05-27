@@ -119,4 +119,9 @@ build(){
     done
 }
 
+if [ "$1" == "-q" ]; then
+  DBG_RUN=
+  STATICDIR=
+fi
+
 main

@@ -9,9 +9,16 @@ if [ ! "$1" ]; then
   echo Please give a version-number
   exit
 fi
+
 VERSION=$1
 APPS="cosi"
 BUILD=cosi_bin
+
+perl -pi -e "s/^(const Version = \").*/\${1}$VERSION\"/" cosi.go
+
+if ! ./test_cosi.sh -q; then
+  echo -e "\nTest is failing - not compiling"
+fi
 
 compile(){
     rm -rf $BUILD
