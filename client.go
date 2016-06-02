@@ -15,7 +15,7 @@ import (
 
 	"github.com/dedis/cosi/lib"
 	s "github.com/dedis/cosi/service"
-	"github.com/dedis/crypto/abstract"
+	"gopkg.in/dedis/crypto.v0/abstract"
 	"gopkg.in/codegangsta/cli.v1"
 	"gopkg.in/dedis/cothority.v0/lib/config"
 	"gopkg.in/dedis/cothority.v0/lib/crypto"

@@ -29,7 +29,7 @@ import (
 	"github.com/dedis/cosi/lib"
 	_ "github.com/dedis/cosi/protocol"
 	_ "github.com/dedis/cosi/service"
-	"github.com/dedis/crypto/config"
+	"gopkg.in/dedis/crypto.v0/config"
 )
 
 func runServer(ctx *cli.Context) {
