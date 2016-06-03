@@ -6,9 +6,9 @@ import (
 	"sync"
 
 	"github.com/dedis/cosi/lib"
-	"gopkg.in/dedis/crypto.v0/abstract"
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 	"gopkg.in/dedis/cothority.v0/lib/sda"
+	"gopkg.in/dedis/crypto.v0/abstract"
 )
 
 func init() {
