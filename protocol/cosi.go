@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/dedis/cosi/lib"
 	"github.com/dedis/crypto/abstract"
+	"github.com/dedis/crypto/cosi"
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 	"gopkg.in/dedis/cothority.v0/lib/sda"
 )
@@ -21,7 +21,6 @@ func init() {
 //  - Commitment
 //  - Challenge
 //  - Response
-// It uses lib/cosi as the main structure for the protocol.
 
 // ProtocolCosi is the main structure holding the round and the sda.Node.
 type ProtocolCosi struct {

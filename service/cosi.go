@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	libcosi "github.com/dedis/cosi/lib"
 	"github.com/dedis/cosi/protocol"
 	"gopkg.in/dedis/cothority.v0/lib/crypto"
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
@@ -69,11 +68,9 @@ func (cs *Cosi) SignatureRequest(e *network.Entity, req *SignatureRequest) (netw
 	if err != nil {
 		return nil, errors.New("Couldn't hash message: " + err.Error())
 	}
-	response := make(chan *libcosi.Signature)
+	response := make(chan []byte)
 	pcosi.RegisterDoneCallback(func(sig []byte) {
-		response <- &libcosi.Signature{
-			Sig: sig,
-		}
+		response <- sig
 	})
 	dbg.Lvl3("Cosi Service starting up root protocol")
 	go pi.Dispatch()
@@ -84,7 +81,7 @@ func (cs *Cosi) SignatureRequest(e *network.Entity, req *SignatureRequest) (netw
 	}
 	return &SignatureResponse{
 		Sum:       h,
-		Signature: sig.Sig,
+		Signature: sig,
 	}, nil
 }
 

@@ -1,7 +1,7 @@
 package cosi
 
 import (
-	"github.com/dedis/cosi/lib"
+	"github.com/dedis/crypto/cosi"
 	"gopkg.in/dedis/cothority.v0/lib/sda"
 )
 

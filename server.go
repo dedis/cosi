@@ -26,10 +26,10 @@ import (
 
 	"regexp"
 
-	"github.com/dedis/cosi/lib"
 	_ "github.com/dedis/cosi/protocol"
 	_ "github.com/dedis/cosi/service"
 	"github.com/dedis/crypto/config"
+	"github.com/dedis/crypto/cosi"
 )
 
 func runServer(ctx *cli.Context) {
@@ -229,7 +229,7 @@ func createKeyPair() (string, string) {
 		stderrExit("[-] Error formating private key to hexadecimal. Abort.")
 	}
 	// use the transformation for ed25519 signatures
-	point := cosi.Ed25519Public(network.Suite, kp.Secret)
+	point := cosi.Ed25519ToPublic(network.Suite, kp.Secret)
 	pubStr, err := crypto.PubHex(network.Suite, point)
 	if err != nil {
 		stderrExit("[-] Could not parse public key. Abort.")
