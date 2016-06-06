@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/dedis/cosi/lib"
-	"github.com/dedis/cothority/lib/network"
+	"gopkg.in/dedis/cothority.v0/lib/network"
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 	"gopkg.in/dedis/cothority.v0/lib/sda"
 )

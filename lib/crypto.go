@@ -4,9 +4,9 @@ import (
 	"crypto/sha512"
 	"math/big"
 
-	"github.com/dedis/crypto/abstract"
-	"github.com/dedis/crypto/nist"
-	"github.com/dedis/crypto/util"
+	"gopkg.in/dedis/crypto.v0/abstract"
+	"gopkg.in/dedis/crypto.v0/nist"
+	"gopkg.in/dedis/crypto.v0/util"
 )
 
 func SecretToSlice(secret abstract.Secret) []byte {

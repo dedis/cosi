@@ -40,7 +40,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/dedis/crypto/abstract"
+	"gopkg.in/dedis/crypto.v0/abstract"
 	//own "github.com/nikkolasg/learning/crypto/util"
 )
 

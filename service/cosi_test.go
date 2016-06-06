@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/dedis/cosi/lib"
-	"github.com/dedis/cothority/lib/network"
+	"gopkg.in/dedis/cothority.v0/lib/network"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 	"gopkg.in/dedis/cothority.v0/lib/sda"
