@@ -4,13 +4,15 @@ go:
       - 1.6
 
 install:
-      - go get github.com/dedis/crypto
-      - cd $GOPATH/src/github.com/dedis/crypto; git checkout development
-      - cd $GOPATH/src/github.com/dedis/cosi; go get -t ./...
+  - go get github.com/dedis/crypto
+  - cd $GOPATH/src/github.com/dedis/crypto; git checkout development
+  - cd $GOPATH/src/github.com/dedis/cosi; go get -t ./...
 
 script:
-      - ./gofmt.sh
-      - go test -race -p=1 ./...
+  - ./gofmt.sh
+  - go get -u github.com/golang/lint/golint
+  - ./lint.sh
+  - go test -race -p=1 ./...
 
 notifications:
       email: false
