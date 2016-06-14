@@ -1,4 +1,4 @@
-package cosi
+package protocol
 
 import (
 	"github.com/dedis/cothority/lib/sda"

@@ -1,4 +1,4 @@
-package cosi
+package service
 
 import (
 	"encoding/base64"

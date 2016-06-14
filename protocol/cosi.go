@@ -1,5 +1,5 @@
 // Package cosi implements a round of a Collective Signing protocol.
-package cosi
+package protocol
 
 import (
 	"fmt"
@@ -11,8 +11,10 @@ import (
 	"github.com/dedis/crypto/cosi"
 )
 
+var Name = "CoSi"
+
 func init() {
-	sda.ProtocolRegisterName("CoSi", NewProtocolCosi)
+	sda.ProtocolRegisterName(Name, NewProtocolCosi)
 }
 
 // This Cosi protocol is the simplest version, the "vanilla" version with the
