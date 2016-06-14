@@ -5,6 +5,7 @@ go:
       - tip
 
 script:
+      - cd $GOPATH/src/gopkg.in/dedis/crypto; git checkout development
       - go test -race -p=1 ./...
 
 notifications:
