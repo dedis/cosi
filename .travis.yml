@@ -9,7 +9,7 @@ install:
       cd $GOPATH/src/github.com/dedis/$repo; 
       git checkout development;
     done
-  - cd $GOPATH/src/github.com/dedis/cosi; go get -t ./...
+  - cd $TRAVIS_BUILD_DIR; go get -t ./...
 
 script:
   - ./gofmt.sh
