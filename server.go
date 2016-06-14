@@ -16,11 +16,11 @@ import (
 	"strconv"
 	"strings"
 
+	c "github.com/dedis/cothority/app/lib/config"
+	"github.com/dedis/cothority/lib/crypto"
+	"github.com/dedis/cothority/lib/dbg"
+	"github.com/dedis/cothority/lib/network"
 	"gopkg.in/codegangsta/cli.v1"
-	c "gopkg.in/dedis/cothority.v0/lib/config"
-	"gopkg.in/dedis/cothority.v0/lib/crypto"
-	"gopkg.in/dedis/cothority.v0/lib/dbg"
-	"gopkg.in/dedis/cothority.v0/lib/network"
 	// Empty imports to have the init-functions called which should
 	// register the protocol
 
@@ -29,7 +29,6 @@ import (
 	_ "github.com/dedis/cosi/protocol"
 	_ "github.com/dedis/cosi/service"
 	"github.com/dedis/crypto/config"
-	"github.com/dedis/crypto/cosi"
 )
 
 func runServer(ctx *cli.Context) {
@@ -228,9 +227,7 @@ func createKeyPair() (string, string) {
 	if err != nil {
 		stderrExit("[-] Error formating private key to hexadecimal. Abort.")
 	}
-	// use the transformation for ed25519 signatures
-	point := cosi.Ed25519ToPublic(network.Suite, kp.Secret)
-	pubStr, err := crypto.PubHex(network.Suite, point)
+	pubStr, err := crypto.PubHex(network.Suite, kp.Public)
 	if err != nil {
 		stderrExit("[-] Could not parse public key. Abort.")
 	}
