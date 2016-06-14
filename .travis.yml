@@ -1,11 +1,14 @@
 language: go
 
 go:
-      - 1.5
-      - tip
+      - 1.6
+
+install:
+      - go get github.com/dedis/crypto
+      - cd $GOPATH/src/github.com/dedis/crypto; git checkout development
+      - go get ./...
 
 script:
-      - cd $GOPATH/src/gopkg.in/dedis/crypto; git checkout development
       - go test -race -p=1 ./...
 
 notifications:
