@@ -14,7 +14,7 @@ import (
 	"github.com/dedis/cothority/lib/dbg"
 )
 
-// BinaryName represents the Name of the binary
+// inaryName represents the Name of the binary
 const BinaryName = "cosi"
 
 // Version of the binary
