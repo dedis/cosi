@@ -4,10 +4,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dedis/cosi/lib"
+	"github.com/dedis/cothority/lib/dbg"
 	"github.com/dedis/cothority/lib/network"
-	"gopkg.in/dedis/cothority.v0/lib/dbg"
-	"gopkg.in/dedis/cothority.v0/lib/sda"
+	"github.com/dedis/cothority/lib/sda"
+	"github.com/dedis/crypto/cosi"
 )
 
 func TestCosi(t *testing.T) {
@@ -17,7 +17,6 @@ func TestCosi(t *testing.T) {
 		dbg.Lvl2("Running cosi with", nbrHosts, "hosts")
 		local := sda.NewLocalTest()
 		hosts, el, tree := local.GenBigTree(nbrHosts, nbrHosts, 3, true, true)
-		formatEntityList(local, hosts, el)
 		aggPublic := network.Suite.Point().Null()
 		for _, e := range el.List {
 			aggPublic = aggPublic.Add(aggPublic, e.Public)
@@ -43,7 +42,7 @@ func TestCosi(t *testing.T) {
 		}
 
 		// Start the protocol
-		p, err := local.CreateProtocol("CoSi", tree)
+		p, err := local.CreateProtocol(tree, "CoSi")
 		if err != nil {
 			t.Fatal("Couldn't create new node:", err)
 		}
@@ -57,12 +56,5 @@ func TestCosi(t *testing.T) {
 			t.Fatal("Could not get signature verification done in time")
 		}
 		local.CloseAll()
-	}
-}
-
-func formatEntityList(local *sda.LocalTest, h []*sda.Host, el *sda.EntityList) {
-	for i := range el.List {
-		priv := local.GetPrivate(h[i])
-		el.List[i].Public = cosi.Ed25519Public(network.Suite, priv)
 	}
 }
