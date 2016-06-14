@@ -1,21 +1,13 @@
 language: go
 
 go:
-      - 1.6
+  - 1.6
 
 install:
-  - go get github.com/dedis/crypto
-  - for repo in crypto cothority; do
-      cd $GOPATH/src/github.com/dedis/$repo; 
-      git checkout development;
-    done
-  - cd $TRAVIS_BUILD_DIR; grep NewTreeNode service/cosi.go; go get -t ./...
+  - make install
 
 script:
-  - ./gofmt.sh
-  - go get -u github.com/golang/lint/golint
-  - ./lint.sh
-  - go test -race -p=1 ./...
+  - make test
 
 notifications:
-      email: false
+  email: false
