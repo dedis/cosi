@@ -13,15 +13,15 @@ import (
 
 	"fmt"
 
+	"github.com/codegangsta/cli"
 	s "github.com/dedis/cosi/service"
+	"github.com/dedis/cothority/app/lib/config"
+	"github.com/dedis/cothority/lib/crypto"
+	"github.com/dedis/cothority/lib/dbg"
+	"github.com/dedis/cothority/lib/network"
+	"github.com/dedis/cothority/lib/sda"
 	"github.com/dedis/crypto/abstract"
 	"github.com/dedis/crypto/cosi"
-	"gopkg.in/codegangsta/cli.v1"
-	"gopkg.in/dedis/cothority.v0/lib/config"
-	"gopkg.in/dedis/cothority.v0/lib/crypto"
-	"gopkg.in/dedis/cothority.v0/lib/dbg"
-	"gopkg.in/dedis/cothority.v0/lib/network"
-	"gopkg.in/dedis/cothority.v0/lib/sda"
 )
 
 // checkConfig contacts all servers and verifies if it receives a valid
@@ -30,27 +30,29 @@ func checkConfig(c *cli.Context) error {
 	tomlFileName := c.String(optionGroup)
 	f, err := os.Open(tomlFileName)
 	printErrAndExit("Couldn't open group definition file: %v", err)
-	el, descs, err := config.ReadGroupDescToml(f)
+	group, err := config.ReadGroupDescToml(f)
 	printErrAndExit("Error while reading group definition file: %v", err)
-	if len(el.List) == 0 {
+	if len(group.EntityList.List) == 0 {
 		printErrAndExit("Empty entity or invalid group defintion in: %s",
 			tomlFileName)
 	}
 	fmt.Println("[+] Checking the availability and responsiveness of the servers in the group...")
+	el := group.EntityList
 	// First check all servers individually
 	for i := range el.List {
-		checkList(sda.NewEntityList(el.List[i:i+1]), descs[i:i+1])
+		descs := []string{group.GetDescription(el.List[i]), group.GetDescription(el.List[i+1])}
+		checkList(sda.NewEntityList(el.List[i:i+1]), descs)
 	}
 	if len(el.List) > 1 {
 		// Then check pairs of servers
 		for i, first := range el.List {
 			for j, second := range el.List[i+1:] {
-				desc := []string{descs[i], descs[i+j+1]}
+				descs := []string{group.GetDescription(el.List[i]), group.GetDescription(el.List[i+j+1])}
 				es := []*network.Entity{first, second}
-				checkList(sda.NewEntityList(es), desc)
+				checkList(sda.NewEntityList(es), descs)
 				es[0], es[1] = es[1], es[0]
-				desc[0], desc[1] = desc[1], desc[0]
-				checkList(sda.NewEntityList(es), desc)
+				descs[0], descs[1] = descs[1], descs[0]
+				checkList(sda.NewEntityList(es), descs)
 			}
 		}
 	}
