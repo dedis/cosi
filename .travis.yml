@@ -9,6 +9,7 @@ install:
       - cd $GOPATH/src/github.com/dedis/cosi
 
 script:
+      - ./gofmt.sh
       - go test -race -p=1 ./...
 
 notifications:
