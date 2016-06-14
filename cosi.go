@@ -14,7 +14,7 @@ import (
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 )
 
-// Name of the binary
+// BinaryName represents the Name of the binary
 const BinaryName = "cosi"
 
 // Version of the binary
