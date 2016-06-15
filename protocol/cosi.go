@@ -1,4 +1,4 @@
-// Package cosi implements a round of a Collective Signing protocol.
+// Package protocol implements a round of a Collective Signing protocol.
 package protocol
 
 import (
@@ -11,6 +11,7 @@ import (
 	"github.com/dedis/crypto/cosi"
 )
 
+// Name can be used to reference the registered protocol.
 var Name = "CoSi"
 
 func init() {
@@ -24,8 +25,8 @@ func init() {
 //  - Challenge
 //  - Response
 
-// ProtocolCosi is the main structure holding the round and the sda.Node.
-type ProtocolCosi struct {
+// CoSi is the main structure holding the round and the sda.Node.
+type CoSi struct {
 	// The node that represents us
 	*sda.TreeNodeInstance
 	// TreeNodeId cached
@@ -94,7 +95,7 @@ func NewProtocolCosi(node *sda.TreeNodeInstance) (sda.ProtocolInstance, error) {
 		publics[i] = e.Public
 	}
 
-	pc := &ProtocolCosi{
+	pc := &CoSi{
 		Cosi:             cosi.NewCosi(node.Suite(), node.Private(), publics),
 		TreeNodeInstance: node,
 		done:             make(chan bool),
@@ -121,12 +122,12 @@ func NewProtocolCosi(node *sda.TreeNodeInstance) (sda.ProtocolInstance, error) {
 
 // Start will call the announcement function of its inner Round structure. It
 // will pass nil as *in* message.
-func (pc *ProtocolCosi) Start() error {
+func (pc *CoSi) Start() error {
 	return pc.StartAnnouncement()
 }
 
 // Dispatch will listen on the four channels we use (i.e. four steps)
-func (pc *ProtocolCosi) Dispatch() error {
+func (pc *CoSi) Dispatch() error {
 	for {
 		var err error
 		select {
@@ -148,7 +149,7 @@ func (pc *ProtocolCosi) Dispatch() error {
 }
 
 // StartAnnouncement will start a new announcement.
-func (pc *ProtocolCosi) StartAnnouncement() error {
+func (pc *CoSi) StartAnnouncement() error {
 	dbg.Lvl3(pc.Name(), "Message:", pc.Message)
 	out := &Announcement{
 		From: pc.treeNodeID,
@@ -159,7 +160,7 @@ func (pc *ProtocolCosi) StartAnnouncement() error {
 
 // handleAnnouncement will pass the message to the round and send back the
 // output. If in == nil, we are root and we start the round.
-func (pc *ProtocolCosi) handleAnnouncement(in *Announcement) error {
+func (pc *CoSi) handleAnnouncement(in *Announcement) error {
 	dbg.Lvl3("Message:", pc.Message)
 	// If we have a hook on announcement call the hook
 	if pc.announcementHook != nil {
@@ -179,7 +180,7 @@ func (pc *ProtocolCosi) handleAnnouncement(in *Announcement) error {
 }
 
 // sendAnnouncement simply send the announcement to every children
-func (pc *ProtocolCosi) sendAnnouncement(ann *Announcement) error {
+func (pc *CoSi) sendAnnouncement(ann *Announcement) error {
 	var err error
 	for _, tn := range pc.Children() {
 		// still try to send to everyone
@@ -190,7 +191,7 @@ func (pc *ProtocolCosi) sendAnnouncement(ann *Announcement) error {
 
 // handleAllCommitment takes the full set of messages from the children and passes
 // it to the parent
-func (pc *ProtocolCosi) handleCommitment(in *Commitment) error {
+func (pc *CoSi) handleCommitment(in *Commitment) error {
 	if !pc.IsLeaf() {
 		// add to temporary
 		pc.tempCommitLock.Lock()
@@ -224,7 +225,7 @@ func (pc *ProtocolCosi) handleCommitment(in *Commitment) error {
 }
 
 // StartChallenge start the challenge phase. Typically called by the Root ;)
-func (pc *ProtocolCosi) StartChallenge() error {
+func (pc *CoSi) StartChallenge() error {
 	challenge, err := pc.Cosi.CreateChallenge(pc.Message)
 	if err != nil {
 		return err
@@ -247,7 +248,7 @@ func VerifySignature(suite abstract.Suite, publics []abstract.Point, msg, sig []
 
 // handleChallenge dispatch the challenge to the round and then dispatch the
 // results down the tree.
-func (pc *ProtocolCosi) handleChallenge(in *Challenge) error {
+func (pc *CoSi) handleChallenge(in *Challenge) error {
 	// TODO check hook
 
 	dbg.Lvl3(pc.Name(), "chal=", fmt.Sprintf("%+v", in.Chall))
@@ -264,7 +265,7 @@ func (pc *ProtocolCosi) handleChallenge(in *Challenge) error {
 }
 
 // sendChallenge sends the challenge down the tree.
-func (pc *ProtocolCosi) sendChallenge(out *Challenge) error {
+func (pc *CoSi) sendChallenge(out *Challenge) error {
 	var err error
 	for _, tn := range pc.Children() {
 		err = pc.SendTo(tn, out)
@@ -274,7 +275,7 @@ func (pc *ProtocolCosi) sendChallenge(out *Challenge) error {
 }
 
 // handleResponse brings up the response of each node in the tree to the root.
-func (pc *ProtocolCosi) handleResponse(in *Response) error {
+func (pc *CoSi) handleResponse(in *Response) error {
 	if !pc.IsLeaf() {
 		// add to temporary
 		pc.tempResponseLock.Lock()
@@ -318,7 +319,7 @@ func (pc *ProtocolCosi) handleResponse(in *Response) error {
 }
 
 // Cleanup closes the protocol and calls DoneCallback, if defined
-func (pc *ProtocolCosi) Cleanup() {
+func (pc *CoSi) Cleanup() {
 	dbg.Lvl3(pc.Entity().First(), "Cleaning up")
 	// if callback when finished
 	if pc.DoneCallback != nil {
@@ -331,31 +332,31 @@ func (pc *ProtocolCosi) Cleanup() {
 }
 
 // SigningMessage simply set the message to sign for this round
-func (pc *ProtocolCosi) SigningMessage(msg []byte) {
+func (pc *CoSi) SigningMessage(msg []byte) {
 	pc.Message = msg
 	dbg.Lvl2(pc.Name(), "Root will sign message=", pc.Message)
 }
 
 // RegisterAnnouncementHook allows for handling what should happen upon an
 // announcement
-func (pc *ProtocolCosi) RegisterAnnouncementHook(fn AnnouncementHook) {
+func (pc *CoSi) RegisterAnnouncementHook(fn AnnouncementHook) {
 	pc.announcementHook = fn
 }
 
 // RegisterCommitmentHook allows for handling what should happen when a
 // commitment is received
-func (pc *ProtocolCosi) RegisterCommitmentHook(fn CommitmentHook) {
+func (pc *CoSi) RegisterCommitmentHook(fn CommitmentHook) {
 	pc.commitmentHook = fn
 }
 
 // RegisterChallengeHook allows for handling what should happen when a
 // challenge is received
-func (pc *ProtocolCosi) RegisterChallengeHook(fn ChallengeHook) {
+func (pc *CoSi) RegisterChallengeHook(fn ChallengeHook) {
 	pc.challengeHook = fn
 }
 
 // RegisterDoneCallback allows for handling what should happen when a
 // the protocol is done
-func (pc *ProtocolCosi) RegisterDoneCallback(fn func(sig []byte)) {
+func (pc *CoSi) RegisterDoneCallback(fn func(sig []byte)) {
 	pc.DoneCallback = fn
 }
