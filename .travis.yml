@@ -1,11 +1,13 @@
 language: go
 
 go:
-      - 1.5
-      - tip
+  - 1.6
+
+install:
+  - make install_dev
 
 script:
-      - go test -race -p=1 ./...
+  - make test
 
 notifications:
-      email: false
+  email: false

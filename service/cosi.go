@@ -62,7 +62,7 @@ func (cs *Cosi) SignatureRequest(e *network.Entity, req *SignatureRequest) (netw
 		return nil, errors.New("Couldn't make new protocol: " + err.Error())
 	}
 	cs.RegisterProtocolInstance(pi)
-	pcosi := pi.(*protocol.ProtocolCosi)
+	pcosi := pi.(*protocol.CoSi)
 	pcosi.SigningMessage(req.Message)
 	h, err := crypto.HashBytes(network.Suite.Hash(), req.Message)
 	if err != nil {
