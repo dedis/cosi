@@ -69,7 +69,7 @@ func (cs *Cosi) SignatureRequest(e *network.Entity, req *SignatureRequest) (netw
 		return nil, errors.New("Couldn't hash message: " + err.Error())
 	}
 	response := make(chan []byte)
-	pcosi.RegisterDoneCallback(func(sig []byte) {
+	pcosi.RegisterSignatureHook(func(sig []byte) {
 		response <- sig
 	})
 	dbg.Lvl3("Cosi Service starting up root protocol")

@@ -48,7 +48,7 @@ func TestCosi(t *testing.T) {
 		}
 		root = p.(*CoSi)
 		root.Message = msg
-		root.RegisterDoneCallback(doneFunc)
+		root.RegisterSignatureHook(doneFunc)
 		go root.StartProtocol()
 		select {
 		case <-done:

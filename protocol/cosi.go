@@ -54,14 +54,12 @@ type CoSi struct {
 	tempResponse []abstract.Secret
 	// lock associated
 	tempResponseLock *sync.Mutex
-	DoneCallback     func(sig []byte)
 
 	// hooks related to the various phase of the protocol.
-	// XXX NOT DEPLOYED YET / NOT IN USE.
-	// announcement hook
 	announcementHook AnnouncementHook
 	commitmentHook   CommitmentHook
 	challengeHook    ChallengeHook
+	signatureHook    SignatureHook
 }
 
 // AnnouncementHook allows for handling what should happen upon an
@@ -75,6 +73,9 @@ type CommitmentHook func(in []abstract.Point) error
 // ChallengeHook allows for handling what should happen when a
 // challenge is received
 type ChallengeHook func(ch abstract.Secret) error
+
+// SignatureHook allows registering a handler when the signature is done
+type SignatureHook func(sig []byte)
 
 // NewProtocolCosi returns a ProtocolCosi with the node set with the right channels.
 // Use this function like this:
@@ -120,12 +121,6 @@ func NewCoSi(node *sda.TreeNodeInstance) (sda.ProtocolInstance, error) {
 	return c, err
 }
 
-// Start will call the announcement function of its inner Round structure. It
-// will pass nil as *in* message.
-func (c *CoSi) Start() error {
-	return c.StartAnnouncement()
-}
-
 // Dispatch will listen on the four channels we use (i.e. four steps)
 func (c *CoSi) Dispatch() error {
 	for {
@@ -148,14 +143,19 @@ func (c *CoSi) Dispatch() error {
 	}
 }
 
-// StartAnnouncement will start a new announcement.
-func (c *CoSi) StartAnnouncement() error {
-	dbg.Lvl3(c.Name(), "Message:", c.Message)
-	out := &Announcement{
-		From: c.treeNodeID,
-	}
-
+// Start will call the announcement function of its inner Round structure. It
+// will pass nil as *in* message.
+func (c *CoSi) Start() error {
+	out := &Announcement{}
 	return c.handleAnnouncement(out)
+}
+
+// VerifySignature verifies if the challenge and the secret (from the response phase) form a
+// correct signature for this message using the aggregated public key.
+// This is copied from lib/cosi, so that you don't need to include both lib/cosi
+// and protocols/cosi
+func VerifySignature(suite abstract.Suite, publics []abstract.Point, msg, sig []byte) error {
+	return cosi.VerifySignature(suite, publics, msg, sig)
 }
 
 // handleAnnouncement will pass the message to the round and send back the
@@ -171,26 +171,13 @@ func (c *CoSi) handleAnnouncement(in *Announcement) error {
 	if c.IsLeaf() {
 		return c.handleCommitment(nil)
 	}
-	out := &Announcement{
-		From: c.treeNodeID,
-	}
-
-	// send the output to children
-	return c.sendAnnouncement(out)
+	// send to children
+	return c.SendToChildren(in)
 }
 
-// sendAnnouncement simply send the announcement to every children
-func (c *CoSi) sendAnnouncement(ann *Announcement) error {
-	var err error
-	for _, tn := range c.Children() {
-		// still try to send to everyone
-		err = c.SendTo(tn, ann)
-	}
-	return err
-}
-
-// handleAllCommitment takes the full set of messages from the children and passes
-// it to the parent
+// handleAllCommitment relay the commitments up in the tree
+// It expects *in* to be the full set of messages from the children.
+// The children's commitment must remain constants.
 func (c *CoSi) handleCommitment(in *Commitment) error {
 	if !c.IsLeaf() {
 		// add to temporary
@@ -214,7 +201,7 @@ func (c *CoSi) handleCommitment(in *Commitment) error {
 
 	// if we are the root, we need to start the Challenge
 	if c.IsRoot() {
-		return c.StartChallenge()
+		return c.startChallenge()
 	}
 
 	// otherwise send it to parent
@@ -224,8 +211,8 @@ func (c *CoSi) handleCommitment(in *Commitment) error {
 	return c.SendTo(c.Parent(), outMsg)
 }
 
-// StartChallenge start the challenge phase. Typically called by the Root ;)
-func (c *CoSi) StartChallenge() error {
+// StartChallenge starts the challenge phase. Typically called by the Root ;)
+func (c *CoSi) startChallenge() error {
 	challenge, err := c.cosi.CreateChallenge(c.Message)
 	if err != nil {
 		return err
@@ -236,14 +223,6 @@ func (c *CoSi) StartChallenge() error {
 	dbg.Lvl3(c.Name(), "Starting Chal=", fmt.Sprintf("%+v", challenge), " (message =", string(c.Message))
 	return c.handleChallenge(out)
 
-}
-
-// VerifySignature verifies if the challenge and the secret (from the response phase) form a
-// correct signature for this message using the aggregated public key.
-// This is copied from lib/cosi, so that you don't need to include both lib/cosi
-// and protocols/cosi
-func VerifySignature(suite abstract.Suite, publics []abstract.Point, msg, sig []byte) error {
-	return cosi.VerifySignature(suite, publics, msg, sig)
 }
 
 // handleChallenge dispatch the challenge to the round and then dispatch the
@@ -261,17 +240,7 @@ func (c *CoSi) handleChallenge(in *Challenge) error {
 	}
 
 	// otherwise send it to children
-	return c.sendChallenge(in)
-}
-
-// sendChallenge sends the challenge down the tree.
-func (c *CoSi) sendChallenge(out *Challenge) error {
-	var err error
-	for _, tn := range c.Children() {
-		err = c.SendTo(tn, out)
-	}
-	return err
-
+	return c.SendToChildren(in)
 }
 
 // handleResponse brings up the response of each node in the tree to the root.
@@ -287,25 +256,16 @@ func (c *CoSi) handleResponse(in *Response) error {
 			return nil
 		}
 	}
-	defer c.Cleanup()
+	// protocol is finished
+	defer func() {
+		close(c.done)
+		c.Done()
+	}()
 
 	dbg.Lvl3(c.Name(), "aggregated")
 	outResponse, err := c.cosi.Response(c.tempResponse)
 	if err != nil {
 		return err
-	}
-
-	// Simulation feature => time the verification process.
-	if (VerifyResponse == 1 && c.IsRoot()) || VerifyResponse == 2 {
-		dbg.Lvl3(c.Name(), "(root=", c.IsRoot(), ") Doing Response verification", VerifyResponse)
-		// verify the responses at each level with the aggregate
-		// public key of this subtree.
-		/*if err := c.Cosi.VerifyResponses(c); err != nil {*/
-		//dbg.Error("Verification error", err)
-		//return fmt.Errorf("%s Verifcation of responses failed:%s", c.Name(), err)
-		/*}*/
-	} else {
-		dbg.Lvl3(c.Name(), "(root=", c.IsRoot(), ") Skipping Response verification", VerifyResponse)
 	}
 
 	out := &Response{
@@ -315,20 +275,12 @@ func (c *CoSi) handleResponse(in *Response) error {
 	if !c.IsRoot() {
 		return c.SendTo(c.Parent(), out)
 	}
-	return nil
-}
 
-// Cleanup closes the protocol and calls DoneCallback, if defined
-func (c *CoSi) Cleanup() {
-	dbg.Lvl3(c.Entity().First(), "Cleaning up")
-	// if callback when finished
-	if c.DoneCallback != nil {
-		dbg.Lvl3("Calling doneCallback")
-		c.DoneCallback(c.cosi.Signature())
+	// we are root, we have the signature now
+	if c.signatureHook != nil {
+		c.signatureHook(c.cosi.Signature())
 	}
-	close(c.done)
-	c.Done()
-
+	return nil
 }
 
 // SigningMessage simply set the message to sign for this round
@@ -357,6 +309,6 @@ func (c *CoSi) RegisterChallengeHook(fn ChallengeHook) {
 
 // RegisterDoneCallback allows for handling what should happen when a
 // the protocol is done
-func (c *CoSi) RegisterDoneCallback(fn func(sig []byte)) {
-	c.DoneCallback = fn
+func (c *CoSi) RegisterSignatureHook(fn func(sig []byte)) {
+	c.signatureHook = fn
 }

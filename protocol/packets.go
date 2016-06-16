@@ -19,8 +19,6 @@ var VerifyResponse = 1
 
 // Announcement is broadcasted message initiated and signed by proposer.
 type Announcement struct {
-	// From = TreeNodeId in the Tree
-	From sda.TreeNodeID
 }
 
 // Commitment of all nodes together with the data they want
