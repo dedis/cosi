@@ -32,7 +32,7 @@ type ProtocolCosi struct {
 	treeNodeID sda.TreeNodeID
 	// the cosi struct we use (since it is a cosi protocol)
 	// Public because we will need it from other protocols.
-	Cosi *cosi.CoSi
+	cosi *cosi.CoSi
 	// the message we want to sign typically given by the Root
 	Message []byte
 	// The channel waiting for Announcement message
@@ -95,7 +95,7 @@ func NewProtocolCosi(node *sda.TreeNodeInstance) (sda.ProtocolInstance, error) {
 	}
 
 	pc := &ProtocolCosi{
-		Cosi:             cosi.NewCosi(node.Suite(), node.Private(), publics),
+		cosi:             cosi.NewCosi(node.Suite(), node.Private(), publics),
 		TreeNodeInstance: node,
 		done:             make(chan bool),
 		tempCommitLock:   new(sync.Mutex),
@@ -209,7 +209,7 @@ func (pc *ProtocolCosi) handleCommitment(in *Commitment) error {
 	}
 
 	// go to Commit()
-	out := pc.Cosi.Commit(nil, pc.tempCommitment)
+	out := pc.cosi.Commit(nil, pc.tempCommitment)
 
 	// if we are the root, we need to start the Challenge
 	if pc.IsRoot() {
@@ -225,7 +225,7 @@ func (pc *ProtocolCosi) handleCommitment(in *Commitment) error {
 
 // StartChallenge start the challenge phase. Typically called by the Root ;)
 func (pc *ProtocolCosi) StartChallenge() error {
-	challenge, err := pc.Cosi.CreateChallenge(pc.Message)
+	challenge, err := pc.cosi.CreateChallenge(pc.Message)
 	if err != nil {
 		return err
 	}
@@ -252,7 +252,7 @@ func (pc *ProtocolCosi) handleChallenge(in *Challenge) error {
 
 	dbg.Lvl3(pc.Name(), "chal=", fmt.Sprintf("%+v", in.Chall))
 	// else dispatch it to cosi
-	pc.Cosi.Challenge(in.Chall)
+	pc.cosi.Challenge(in.Chall)
 
 	// if we are leaf, then go to response
 	if pc.IsLeaf() {
@@ -289,7 +289,7 @@ func (pc *ProtocolCosi) handleResponse(in *Response) error {
 	defer pc.Cleanup()
 
 	dbg.Lvl3(pc.Name(), "aggregated")
-	outResponse, err := pc.Cosi.Response(pc.tempResponse)
+	outResponse, err := pc.cosi.Response(pc.tempResponse)
 	if err != nil {
 		return err
 	}
@@ -323,7 +323,7 @@ func (pc *ProtocolCosi) Cleanup() {
 	// if callback when finished
 	if pc.DoneCallback != nil {
 		dbg.Lvl3("Calling doneCallback")
-		pc.DoneCallback(pc.Cosi.Signature())
+		pc.DoneCallback(pc.cosi.Signature())
 	}
 	close(pc.done)
 	pc.Done()

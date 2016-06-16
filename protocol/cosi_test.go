@@ -32,7 +32,7 @@ func TestCosi(t *testing.T) {
 		doneFunc := func(sig []byte) {
 			suite := hosts[0].Suite()
 			publics := el.Publics()
-			if err := root.Cosi.VerifyResponses(aggPublic); err != nil {
+			if err := root.cosi.VerifyResponses(aggPublic); err != nil {
 				t.Fatal("Error verifying responses", err)
 			}
 			if err := cosi.VerifySignature(suite, publics, msg, sig); err != nil {
