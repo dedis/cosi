@@ -31,12 +31,12 @@ type Commitment struct {
 
 // Challenge is the challenge computed by the root-node.
 type Challenge struct {
-	Chall abstract.Secret
+	Chall abstract.Scalar
 }
 
 // Response with which every node replies with.
 type Response struct {
-	Resp abstract.Secret
+	Resp abstract.Scalar
 }
 
 //Theses are pairs of TreeNode + the actual message we want to listen on.

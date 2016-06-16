@@ -51,7 +51,7 @@ type CoSi struct {
 	// lock associated
 	tempCommitLock *sync.Mutex
 	// temporary buffer of Response messages
-	tempResponse []abstract.Secret
+	tempResponse []abstract.Scalar
 	// lock associated
 	tempResponseLock *sync.Mutex
 	DoneCallback     func(sig []byte)
@@ -74,7 +74,7 @@ type CommitmentHook func(in []abstract.Point) error
 
 // ChallengeHook allows for handling what should happen when a
 // challenge is received
-type ChallengeHook func(ch abstract.Secret) error
+type ChallengeHook func(ch abstract.Scalar) error
 
 // NewProtocolCosi returns a ProtocolCosi with the node set with the right channels.
 // Use this function like this:
