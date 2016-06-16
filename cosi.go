@@ -11,14 +11,14 @@ import (
 
 	"os"
 
-	"gopkg.in/dedis/cothority.v0/lib/dbg"
+	"github.com/dedis/cothority/lib/dbg"
 )
 
-// Name of the binary
+// BinaryName represents the Name of the binary
 const BinaryName = "cosi"
 
 // Version of the binary
-const Version = "0.8.6"
+const Version = "0.9"
 
 // DefaultGroupFile is the name of the default file to lookup for group
 // definition

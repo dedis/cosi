@@ -2,7 +2,7 @@
 
 # Set to a non-empty value to print debugging messages
 DBG_RUN=1
-. $GOPATH/src/gopkg.in/dedis/cothority.v0/app/libtest.sh
+. $GOPATH/src/github.com/dedis/cothority/app/libtest.sh
 STATICDIR=test
 
 tails=8
@@ -31,7 +31,7 @@ testReconnect(){
         runSrv $s &
         sleep 1
         testOK runCl 1 sign foo.txt
-        pkill -f cosi
+        pkill -f ./cosi
     done
 }
 

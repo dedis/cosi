@@ -16,17 +16,16 @@ import (
 	"strconv"
 	"strings"
 
+	c "github.com/dedis/cothority/app/lib/config"
+	"github.com/dedis/cothority/lib/crypto"
+	"github.com/dedis/cothority/lib/dbg"
+	"github.com/dedis/cothority/lib/network"
 	"gopkg.in/codegangsta/cli.v1"
-	c "gopkg.in/dedis/cothority.v0/lib/config"
-	"gopkg.in/dedis/cothority.v0/lib/crypto"
-	"gopkg.in/dedis/cothority.v0/lib/dbg"
-	"gopkg.in/dedis/cothority.v0/lib/network"
 	// Empty imports to have the init-functions called which should
 	// register the protocol
 
 	"regexp"
 
-	"github.com/dedis/cosi/lib"
 	_ "github.com/dedis/cosi/protocol"
 	_ "github.com/dedis/cosi/service"
 	"github.com/dedis/crypto/config"
@@ -224,18 +223,16 @@ func checkOverwrite(file string, reader *bufio.Reader) bool {
 func createKeyPair() (string, string) {
 	fmt.Println("\n[+] Creation of the ed25519 private and public keys...")
 	kp := config.NewKeyPair(network.Suite)
-	privStr, err := crypto.SecretHex(network.Suite, kp.Secret)
+	privStr, err := crypto.ScalarHex(network.Suite, kp.Secret)
 	if err != nil {
 		stderrExit("[-] Error formating private key to hexadecimal. Abort.")
 	}
-	// use the transformation for ed25519 signatures
-	point := cosi.Ed25519Public(network.Suite, kp.Secret)
-	pubStr, err := crypto.PubHex(network.Suite, point)
+	pubStr, err := crypto.PubHex(network.Suite, kp.Public)
 	if err != nil {
 		stderrExit("[-] Could not parse public key. Abort.")
 	}
 
-	fmt.Println("[+] Public key: ", pubStr, "\n")
+	fmt.Println("[+] Public key: ", pubStr)
 	return privStr, pubStr
 }
 

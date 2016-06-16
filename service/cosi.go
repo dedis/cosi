@@ -1,4 +1,4 @@
-package cosi
+package service
 
 import (
 	"errors"
@@ -6,12 +6,11 @@ import (
 	"fmt"
 	"time"
 
-	libcosi "github.com/dedis/cosi/lib"
 	"github.com/dedis/cosi/protocol"
-	"gopkg.in/dedis/cothority.v0/lib/crypto"
-	"gopkg.in/dedis/cothority.v0/lib/dbg"
-	"gopkg.in/dedis/cothority.v0/lib/network"
-	"gopkg.in/dedis/cothority.v0/lib/sda"
+	"github.com/dedis/cothority/lib/crypto"
+	"github.com/dedis/cothority/lib/dbg"
+	"github.com/dedis/cothority/lib/network"
+	"github.com/dedis/cothority/lib/sda"
 )
 
 // This file contains all the code to run a CoSi service. It is used to reply to
@@ -57,23 +56,21 @@ var CosiResponseType = network.RegisterMessageType(SignatureResponse{})
 // SignatureRequest treats external request to this service.
 func (cs *Cosi) SignatureRequest(e *network.Entity, req *SignatureRequest) (network.ProtocolMessage, error) {
 	tree := req.EntityList.GenerateBinaryTree()
-	tni := cs.NewTreeNodeInstance(tree, tree.Root)
-	pi, err := cosi.NewProtocolCosi(tni)
+	tni := cs.NewTreeNodeInstance(tree, tree.Root, protocol.Name)
+	pi, err := protocol.NewCoSi(tni)
 	if err != nil {
 		return nil, errors.New("Couldn't make new protocol: " + err.Error())
 	}
 	cs.RegisterProtocolInstance(pi)
-	pcosi := pi.(*cosi.ProtocolCosi)
+	pcosi := pi.(*protocol.CoSi)
 	pcosi.SigningMessage(req.Message)
 	h, err := crypto.HashBytes(network.Suite.Hash(), req.Message)
 	if err != nil {
 		return nil, errors.New("Couldn't hash message: " + err.Error())
 	}
-	response := make(chan *libcosi.Signature)
-	pcosi.RegisterDoneCallback(func(sig []byte) {
-		response <- &libcosi.Signature{
-			Sig: sig,
-		}
+	response := make(chan []byte)
+	pcosi.RegisterSignatureHook(func(sig []byte) {
+		response <- sig
 	})
 	dbg.Lvl3("Cosi Service starting up root protocol")
 	go pi.Dispatch()
@@ -84,7 +81,7 @@ func (cs *Cosi) SignatureRequest(e *network.Entity, req *SignatureRequest) (netw
 	}
 	return &SignatureResponse{
 		Sum:       h,
-		Signature: sig.Sig,
+		Signature: sig,
 	}, nil
 }
 
@@ -93,7 +90,7 @@ func (cs *Cosi) SignatureRequest(e *network.Entity, req *SignatureRequest) (netw
 // generate the PI on all others node.
 func (cs *Cosi) NewProtocol(tn *sda.TreeNodeInstance, conf *sda.GenericConfig) (sda.ProtocolInstance, error) {
 	dbg.Lvl3("Cosi Service received New Protocol event")
-	pi, err := cosi.NewProtocolCosi(tn)
+	pi, err := protocol.NewCoSi(tn)
 	go pi.Dispatch()
 	return pi, err
 }

@@ -1,13 +1,13 @@
-package cosi
+package protocol
 
 import (
 	"testing"
 	"time"
 
-	"github.com/dedis/cosi/lib"
+	"github.com/dedis/cothority/lib/dbg"
 	"github.com/dedis/cothority/lib/network"
-	"gopkg.in/dedis/cothority.v0/lib/dbg"
-	"gopkg.in/dedis/cothority.v0/lib/sda"
+	"github.com/dedis/cothority/lib/sda"
+	"github.com/dedis/crypto/cosi"
 )
 
 func TestCosi(t *testing.T) {
@@ -17,7 +17,6 @@ func TestCosi(t *testing.T) {
 		dbg.Lvl2("Running cosi with", nbrHosts, "hosts")
 		local := sda.NewLocalTest()
 		hosts, el, tree := local.GenBigTree(nbrHosts, nbrHosts, 3, true, true)
-		formatEntityList(local, hosts, el)
 		aggPublic := network.Suite.Point().Null()
 		for _, e := range el.List {
 			aggPublic = aggPublic.Add(aggPublic, e.Public)
@@ -28,12 +27,12 @@ func TestCosi(t *testing.T) {
 		msg := []byte("Hello World Cosi")
 
 		// Register the function generating the protocol instance
-		var root *ProtocolCosi
+		var root *CoSi
 		// function that will be called when protocol is finished by the root
 		doneFunc := func(sig []byte) {
 			suite := hosts[0].Suite()
 			publics := el.Publics()
-			if err := root.Cosi.VerifyResponses(aggPublic); err != nil {
+			if err := root.cosi.VerifyResponses(aggPublic); err != nil {
 				t.Fatal("Error verifying responses", err)
 			}
 			if err := cosi.VerifySignature(suite, publics, msg, sig); err != nil {
@@ -43,13 +42,13 @@ func TestCosi(t *testing.T) {
 		}
 
 		// Start the protocol
-		p, err := local.CreateProtocol("CoSi", tree)
+		p, err := local.CreateProtocol(tree, "CoSi")
 		if err != nil {
 			t.Fatal("Couldn't create new node:", err)
 		}
-		root = p.(*ProtocolCosi)
+		root = p.(*CoSi)
 		root.Message = msg
-		root.RegisterDoneCallback(doneFunc)
+		root.RegisterSignatureHook(doneFunc)
 		go root.StartProtocol()
 		select {
 		case <-done:
@@ -57,12 +56,5 @@ func TestCosi(t *testing.T) {
 			t.Fatal("Could not get signature verification done in time")
 		}
 		local.CloseAll()
-	}
-}
-
-func formatEntityList(local *sda.LocalTest, h []*sda.Host, el *sda.EntityList) {
-	for i := range el.List {
-		priv := local.GetPrivate(h[i])
-		el.List[i].Public = cosi.Ed25519Public(network.Suite, priv)
 	}
 }
