@@ -77,7 +77,7 @@ func checkList(list *sda.EntityList, descs []string) {
 	} else {
 		err := verifySignatureHash([]byte(msg), sig, list)
 		if err != nil {
-			fmt.Println(os.Stderr,
+			fmt.Fprintln(os.Stderr,
 				fmt.Sprintf("Invalid signature: %v", err))
 		} else {
 			fmt.Println("Success")

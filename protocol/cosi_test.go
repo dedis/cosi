@@ -27,7 +27,7 @@ func TestCosi(t *testing.T) {
 		msg := []byte("Hello World Cosi")
 
 		// Register the function generating the protocol instance
-		var root *ProtocolCosi
+		var root *CoSi
 		// function that will be called when protocol is finished by the root
 		doneFunc := func(sig []byte) {
 			suite := hosts[0].Suite()
@@ -46,7 +46,7 @@ func TestCosi(t *testing.T) {
 		if err != nil {
 			t.Fatal("Couldn't create new node:", err)
 		}
-		root = p.(*ProtocolCosi)
+		root = p.(*CoSi)
 		root.Message = msg
 		root.RegisterDoneCallback(doneFunc)
 		go root.StartProtocol()

@@ -57,12 +57,12 @@ var CosiResponseType = network.RegisterMessageType(SignatureResponse{})
 func (cs *Cosi) SignatureRequest(e *network.Entity, req *SignatureRequest) (network.ProtocolMessage, error) {
 	tree := req.EntityList.GenerateBinaryTree()
 	tni := cs.NewTreeNodeInstance(tree, tree.Root, protocol.Name)
-	pi, err := protocol.NewProtocolCosi(tni)
+	pi, err := protocol.NewCoSi(tni)
 	if err != nil {
 		return nil, errors.New("Couldn't make new protocol: " + err.Error())
 	}
 	cs.RegisterProtocolInstance(pi)
-	pcosi := pi.(*protocol.ProtocolCosi)
+	pcosi := pi.(*protocol.CoSi)
 	pcosi.SigningMessage(req.Message)
 	h, err := crypto.HashBytes(network.Suite.Hash(), req.Message)
 	if err != nil {
@@ -90,7 +90,7 @@ func (cs *Cosi) SignatureRequest(e *network.Entity, req *SignatureRequest) (netw
 // generate the PI on all others node.
 func (cs *Cosi) NewProtocol(tn *sda.TreeNodeInstance, conf *sda.GenericConfig) (sda.ProtocolInstance, error) {
 	dbg.Lvl3("Cosi Service received New Protocol event")
-	pi, err := protocol.NewProtocolCosi(tn)
+	pi, err := protocol.NewCoSi(tn)
 	go pi.Dispatch()
 	return pi, err
 }

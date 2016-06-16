@@ -232,7 +232,7 @@ func createKeyPair() (string, string) {
 		stderrExit("[-] Could not parse public key. Abort.")
 	}
 
-	fmt.Println("[+] Public key: ", pubStr, "\n")
+	fmt.Println("[+] Public key: ", pubStr)
 	return privStr, pubStr
 }
 
