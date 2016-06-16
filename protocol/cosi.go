@@ -77,7 +77,7 @@ type ChallengeHook func(ch abstract.Secret) error
 // SignatureHook allows registering a handler when the signature is done
 type SignatureHook func(sig []byte)
 
-// NewProtocolCosi returns a ProtocolCosi with the node set with the right channels.
+// NewCoSi returns a ProtocolCosi with the node set with the right channels.
 // Use this function like this:
 // ```
 // round := NewRound****()
@@ -307,7 +307,7 @@ func (c *CoSi) RegisterChallengeHook(fn ChallengeHook) {
 	c.challengeHook = fn
 }
 
-// RegisterDoneCallback allows for handling what should happen when a
+// RegisterSignatureHook allows for handling what should happen when a
 // the protocol is done
 func (c *CoSi) RegisterSignatureHook(fn func(sig []byte)) {
 	c.signatureHook = fn
