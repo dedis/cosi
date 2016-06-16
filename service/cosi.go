@@ -35,8 +35,8 @@ type Cosi struct {
 
 // SignatureRequest is what the Cosi service is expected to receive from clients.
 type SignatureRequest struct {
-	Message    []byte
-	EntityList *sda.EntityList
+	Message []byte
+	Roster  *sda.Roster
 }
 
 // CosiRequestType is the type that is embedded in the Request object for a
@@ -54,8 +54,8 @@ type SignatureResponse struct {
 var CosiResponseType = network.RegisterMessageType(SignatureResponse{})
 
 // SignatureRequest treats external request to this service.
-func (cs *Cosi) SignatureRequest(e *network.Entity, req *SignatureRequest) (network.ProtocolMessage, error) {
-	tree := req.EntityList.GenerateBinaryTree()
+func (cs *Cosi) SignatureRequest(e *network.ServerIdentity, req *SignatureRequest) (network.Body, error) {
+	tree := req.Roster.GenerateBinaryTree()
 	tni := cs.NewTreeNodeInstance(tree, tree.Root, protocol.Name)
 	pi, err := protocol.NewCoSi(tni)
 	if err != nil {
