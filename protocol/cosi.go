@@ -51,7 +51,7 @@ type CoSi struct {
 	// lock associated
 	tempCommitLock *sync.Mutex
 	// temporary buffer of Response messages
-	tempResponse []abstract.Secret
+	tempResponse []abstract.Scalar
 	// lock associated
 	tempResponseLock *sync.Mutex
 
@@ -72,7 +72,7 @@ type CommitmentHook func(in []abstract.Point) error
 
 // ChallengeHook allows for handling what should happen when a
 // challenge is received
-type ChallengeHook func(ch abstract.Secret) error
+type ChallengeHook func(ch abstract.Scalar) error
 
 // SignatureHook allows registering a handler when the signature is done
 type SignatureHook func(sig []byte)

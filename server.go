@@ -223,7 +223,7 @@ func checkOverwrite(file string, reader *bufio.Reader) bool {
 func createKeyPair() (string, string) {
 	fmt.Println("\n[+] Creation of the ed25519 private and public keys...")
 	kp := config.NewKeyPair(network.Suite)
-	privStr, err := crypto.SecretHex(network.Suite, kp.Secret)
+	privStr, err := crypto.ScalarHex(network.Suite, kp.Secret)
 	if err != nil {
 		stderrExit("[-] Error formating private key to hexadecimal. Abort.")
 	}
