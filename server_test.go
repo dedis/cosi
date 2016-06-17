@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"gopkg.in/dedis/cothority.v0/lib/dbg"
+	"gopkg.in/dedis/cothority.v0/dbg"
 )
 
 func TestMain(m *testing.M) {

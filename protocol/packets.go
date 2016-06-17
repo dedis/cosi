@@ -1,7 +1,7 @@
 package protocol
 
 import (
-	"github.com/dedis/cothority/lib/sda"
+	"github.com/dedis/cothority/sda"
 	"github.com/dedis/crypto/abstract"
 )
 

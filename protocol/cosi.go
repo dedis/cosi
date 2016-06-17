@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/dedis/cothority/lib/dbg"
-	"github.com/dedis/cothority/lib/sda"
+	"github.com/dedis/cothority/dbg"
+	"github.com/dedis/cothority/sda"
 	"github.com/dedis/crypto/abstract"
 	"github.com/dedis/crypto/cosi"
 )
@@ -152,7 +152,7 @@ func (c *CoSi) Start() error {
 
 // VerifySignature verifies if the challenge and the secret (from the response phase) form a
 // correct signature for this message using the aggregated public key.
-// This is copied from lib/cosi, so that you don't need to include both lib/cosi
+// This is copied from cosi, so that you don't need to include both lib/cosi
 // and protocols/cosi
 func VerifySignature(suite abstract.Suite, publics []abstract.Point, msg, sig []byte) error {
 	return cosi.VerifySignature(suite, publics, msg, sig)

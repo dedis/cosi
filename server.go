@@ -17,9 +17,9 @@ import (
 	"strings"
 
 	c "github.com/dedis/cothority/app/lib/config"
-	"github.com/dedis/cothority/lib/crypto"
-	"github.com/dedis/cothority/lib/dbg"
-	"github.com/dedis/cothority/lib/network"
+	"github.com/dedis/cothority/crypto"
+	"github.com/dedis/cothority/dbg"
+	"github.com/dedis/cothority/network"
 	"gopkg.in/codegangsta/cli.v1"
 	// Empty imports to have the init-functions called which should
 	// register the protocol
