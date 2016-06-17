@@ -2,7 +2,7 @@
 
 # Set to a non-empty value to print debugging messages
 DBG_RUN=1
-. $GOPATH/src/github.com/dedis/cothority/app/libtest.sh
+. $GOPATH/src/gopkg.in/dedis/cothority.v0/app/libtest.sh
 STATICDIR=test
 
 tails=8

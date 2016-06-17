@@ -32,27 +32,27 @@ func checkConfig(c *cli.Context) error {
 	printErrAndExit("Couldn't open group definition file: %v", err)
 	group, err := config.ReadGroupDescToml(f)
 	printErrAndExit("Error while reading group definition file: %v", err)
-	if len(group.EntityList.List) == 0 {
+	if len(group.Roster.List) == 0 {
 		printErrAndExit("Empty entity or invalid group defintion in: %s",
 			tomlFileName)
 	}
 	fmt.Println("[+] Checking the availability and responsiveness of the servers in the group...")
-	el := group.EntityList
+	r := group.Roster
 	// First check all servers individually
-	for i := range el.List {
-		descs := []string{group.GetDescription(el.List[i]), group.GetDescription(el.List[i+1])}
-		checkList(sda.NewEntityList(el.List[i:i+1]), descs)
+	for i := range r.List {
+		descs := []string{group.GetDescription(r.List[i]), group.GetDescription(r.List[i+1])}
+		checkList(sda.NewRoster(r.List[i:i+1]), descs)
 	}
-	if len(el.List) > 1 {
+	if len(r.List) > 1 {
 		// Then check pairs of servers
-		for i, first := range el.List {
-			for j, second := range el.List[i+1:] {
-				descs := []string{group.GetDescription(el.List[i]), group.GetDescription(el.List[i+j+1])}
-				es := []*network.Entity{first, second}
-				checkList(sda.NewEntityList(es), descs)
+		for i, first := range r.List {
+			for j, second := range r.List[i+1:] {
+				descs := []string{group.GetDescription(r.List[i]), group.GetDescription(r.List[i+j+1])}
+				es := []*network.ServerIdentity{first, second}
+				checkList(sda.NewRoster(es), descs)
 				es[0], es[1] = es[1], es[0]
 				descs[0], descs[1] = descs[1], descs[0]
-				checkList(sda.NewEntityList(es), descs)
+				checkList(sda.NewRoster(es), descs)
 			}
 		}
 	}
@@ -61,7 +61,7 @@ func checkConfig(c *cli.Context) error {
 }
 
 // checkList sends a message to the list and waits for the reply
-func checkList(list *sda.EntityList, descs []string) {
+func checkList(list *sda.Roster, descs []string) {
 	serverStr := ""
 	for i, s := range list.List {
 		name := strings.Split(descs[i], " ")[0]
@@ -183,7 +183,7 @@ func sign(r io.Reader, tomlFileName string) (*s.SignatureResponse, error) {
 
 // signStatement can be used to sign the contents passed in the io.Reader
 // (pass an io.File or use an strings.NewReader for strings)
-func signStatement(read io.Reader, el *sda.EntityList) (*s.SignatureResponse,
+func signStatement(read io.Reader, el *sda.Roster) (*s.SignatureResponse,
 	error) {
 	publics := entityListToPublics(el)
 	client := s.NewClient()
@@ -260,7 +260,7 @@ func verify(fileName, sigFileName, groupToml string) error {
 	return err
 }
 
-func verifySignatureHash(b []byte, sig *s.SignatureResponse, el *sda.EntityList) error {
+func verifySignatureHash(b []byte, sig *s.SignatureResponse, el *sda.Roster) error {
 	// We have to hash twice, as the hash in the signature is the hash of the
 	// message sent to be signed
 	publics := entityListToPublics(el)
@@ -276,9 +276,9 @@ func verifySignatureHash(b []byte, sig *s.SignatureResponse, el *sda.EntityList)
 	}
 	return nil
 }
-func entityListToPublics(el *sda.EntityList) []abstract.Point {
-	publics := make([]abstract.Point, len(el.List))
-	for i, e := range el.List {
+func entityListToPublics(r *sda.Roster) []abstract.Point {
+	publics := make([]abstract.Point, len(r.List))
+	for i, e := range r.List {
 		publics[i] = e.Public
 	}
 	return publics

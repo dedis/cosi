@@ -91,8 +91,8 @@ func NewCoSi(node *sda.TreeNodeInstance) (sda.ProtocolInstance, error) {
 	var err error
 	// XXX just need to take care to take the global list of cosigners once we
 	// do the exception stuff
-	publics := make([]abstract.Point, len(node.EntityList().List))
-	for i, e := range node.EntityList().List {
+	publics := make([]abstract.Point, len(node.Roster().List))
+	for i, e := range node.Roster().List {
 		publics[i] = e.Public
 	}
 
