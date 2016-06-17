@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"github.com/dedis/cosi/protocol"
-	"github.com/dedis/cothority/lib/crypto"
-	"github.com/dedis/cothority/lib/dbg"
-	"github.com/dedis/cothority/lib/network"
-	"github.com/dedis/cothority/lib/sda"
+	"github.com/dedis/cothority/crypto"
+	"github.com/dedis/cothority/dbg"
+	"github.com/dedis/cothority/network"
+	"github.com/dedis/cothority/sda"
 )
 
 // This file contains all the code to run a CoSi service. It is used to reply to

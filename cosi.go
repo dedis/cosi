@@ -11,7 +11,7 @@ import (
 
 	"os"
 
-	"github.com/dedis/cothority/lib/dbg"
+	"github.com/dedis/cothority/dbg"
 )
 
 // BinaryName represents the Name of the binary
