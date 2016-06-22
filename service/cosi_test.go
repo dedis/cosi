@@ -3,15 +3,15 @@ package service
 import (
 	"testing"
 
-	"github.com/dedis/cothority/dbg"
+	"github.com/dedis/cothority/log"
 	"github.com/dedis/cothority/sda"
 	"github.com/dedis/crypto/cosi"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestServiceCosi(t *testing.T) {
-	defer dbg.AfterTest(t)
-	dbg.TestOutput(testing.Verbose(), 4)
+	defer log.AfterTest(t)
+	log.TestOutput(testing.Verbose(), 4)
 	local := sda.NewLocalTest()
 	// generate 5 hosts, they don't connect, they process messages, and they
 	// don't register the tree or entitylist
@@ -21,9 +21,9 @@ func TestServiceCosi(t *testing.T) {
 	// Send a request to the service
 	client := NewClient()
 	msg := []byte("hello cosi service")
-	dbg.Lvl1("Sending request to service...")
+	log.Lvl1("Sending request to service...")
 	res, err := client.SignMsg(el, msg)
-	dbg.ErrFatal(err, "Couldn't send")
+	log.ErrFatal(err, "Couldn't send")
 
 	// verify the response still
 	assert.Nil(t, cosi.VerifySignature(hosts[0].Suite(), el.Publics(),

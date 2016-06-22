@@ -8,7 +8,7 @@ import (
 
 	"github.com/dedis/cosi/protocol"
 	"github.com/dedis/cothority/crypto"
-	"github.com/dedis/cothority/dbg"
+	"github.com/dedis/cothority/log"
 	"github.com/dedis/cothority/network"
 	"github.com/dedis/cothority/sda"
 )
@@ -72,11 +72,11 @@ func (cs *Cosi) SignatureRequest(e *network.ServerIdentity, req *SignatureReques
 	pcosi.RegisterSignatureHook(func(sig []byte) {
 		response <- sig
 	})
-	dbg.Lvl3("Cosi Service starting up root protocol")
+	log.Lvl3("Cosi Service starting up root protocol")
 	go pi.Dispatch()
 	go pi.Start()
 	sig := <-response
-	if dbg.DebugVisible() > 0 {
+	if log.DebugVisible() > 0 {
 		fmt.Printf("%s: Signed a message.\n", time.Now().Format("Mon Jan 2 15:04:05 -0700 MST 2006"))
 	}
 	return &SignatureResponse{
@@ -89,7 +89,7 @@ func (cs *Cosi) SignatureRequest(e *network.ServerIdentity, req *SignatureReques
 // the one starting the protocol) so it's the Service that will be called to
 // generate the PI on all others node.
 func (cs *Cosi) NewProtocol(tn *sda.TreeNodeInstance, conf *sda.GenericConfig) (sda.ProtocolInstance, error) {
-	dbg.Lvl3("Cosi Service received New Protocol event")
+	log.Lvl3("Cosi Service received New Protocol event")
 	pi, err := protocol.NewCoSi(tn)
 	go pi.Dispatch()
 	return pi, err
@@ -102,7 +102,7 @@ func newCosiService(c sda.Context, path string) sda.Service {
 	}
 	err := s.RegisterMessage(s.SignatureRequest)
 	if err != nil {
-		dbg.ErrFatal(err, "Couldn't register message:")
+		log.ErrFatal(err, "Couldn't register message:")
 	}
 	return s
 }
