@@ -31,7 +31,7 @@ testReconnect(){
         runSrv $s &
         sleep 1
         testOK runCl 1 sign foo.txt
-        pkill -f cosi
+        pkill -f ./cosi
     done
 }
 

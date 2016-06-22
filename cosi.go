@@ -11,14 +11,14 @@ import (
 
 	"os"
 
-	"gopkg.in/dedis/cothority.v0/lib/dbg"
+	"github.com/dedis/cothority/log"
 )
 
-// Name of the binary
+// BinaryName represents the Name of the binary
 const BinaryName = "cosi"
 
 // Version of the binary
-const Version = "0.8.6"
+const Version = "0.9"
 
 // DefaultGroupFile is the name of the default file to lookup for group
 // definition
@@ -46,8 +46,8 @@ const optionConfigShort = "c"
 const RequestTimeOut = time.Second * 10
 
 func init() {
-	dbg.SetDebugVisible(1)
-	dbg.SetUseColors(false)
+	log.SetDebugVisible(1)
+	log.SetUseColors(false)
 }
 
 func main() {
@@ -146,7 +146,7 @@ func main() {
 
 	app.Flags = binaryFlags
 	app.Before = func(c *cli.Context) error {
-		dbg.SetDebugVisible(c.GlobalInt("debug"))
+		log.SetDebugVisible(c.GlobalInt("debug"))
 		return nil
 	}
 	app.Run(os.Args)

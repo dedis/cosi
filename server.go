@@ -16,20 +16,19 @@ import (
 	"strconv"
 	"strings"
 
+	c "github.com/dedis/cothority/app/lib/config"
+	"github.com/dedis/cothority/crypto"
+	"github.com/dedis/cothority/log"
+	"github.com/dedis/cothority/network"
 	"gopkg.in/codegangsta/cli.v1"
-	c "gopkg.in/dedis/cothority.v0/lib/config"
-	"gopkg.in/dedis/cothority.v0/lib/crypto"
-	"gopkg.in/dedis/cothority.v0/lib/dbg"
-	"gopkg.in/dedis/cothority.v0/lib/network"
 	// Empty imports to have the init-functions called which should
 	// register the protocol
 
 	"regexp"
 
-	"github.com/dedis/cosi/lib"
 	_ "github.com/dedis/cosi/protocol"
 	_ "github.com/dedis/cosi/service"
-	"gopkg.in/dedis/crypto.v0/config"
+	"github.com/dedis/crypto/config"
 )
 
 func runServer(ctx *cli.Context) {
@@ -37,13 +36,13 @@ func runServer(ctx *cli.Context) {
 	config := ctx.String("config")
 
 	if _, err := os.Stat(config); os.IsNotExist(err) {
-		dbg.Fatalf("[-] Configuration file does not exist. %s. "+
+		log.Fatalf("[-] Configuration file does not exist. %s. "+
 			"Use `cosi server setup` to create one.", config)
 	}
 	// Let's read the config
 	_, host, err := c.ParseCothorityd(config)
 	if err != nil {
-		dbg.Fatal("Couldn't parse config:", err)
+		log.Fatal("Couldn't parse config:", err)
 	}
 	host.ListenAndBind()
 	host.StartProcessMessages()
@@ -195,7 +194,7 @@ func isPublicIP(ip string) bool {
 		"(^172\\.1[6-9]\\.)|(^172\\.2[0-9]\\.)|"+
 		"(^172\\.3[0-1]\\.)|(^192\\.168\\.)", ip)
 	if err != nil {
-		dbg.Error(err)
+		log.Error(err)
 	}
 	return !public
 }
@@ -224,18 +223,16 @@ func checkOverwrite(file string, reader *bufio.Reader) bool {
 func createKeyPair() (string, string) {
 	fmt.Println("\n[+] Creation of the ed25519 private and public keys...")
 	kp := config.NewKeyPair(network.Suite)
-	privStr, err := crypto.SecretHex(network.Suite, kp.Secret)
+	privStr, err := crypto.ScalarHex(network.Suite, kp.Secret)
 	if err != nil {
 		stderrExit("[-] Error formating private key to hexadecimal. Abort.")
 	}
-	// use the transformation for ed25519 signatures
-	point := cosi.Ed25519Public(network.Suite, kp.Secret)
-	pubStr, err := crypto.PubHex(network.Suite, point)
+	pubStr, err := crypto.PubHex(network.Suite, kp.Public)
 	if err != nil {
 		stderrExit("[-] Could not parse public key. Abort.")
 	}
 
-	fmt.Println("[+] Public key: ", pubStr, "\n")
+	fmt.Println("[+] Public key: ", pubStr)
 	return privStr, pubStr
 }
 

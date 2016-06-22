@@ -3,11 +3,11 @@ package main
 import (
 	"testing"
 
-	"gopkg.in/dedis/cothority.v0/lib/dbg"
+	"github.com/dedis/cothority/log"
 )
 
 func TestMain(m *testing.M) {
-	dbg.MainTest(m)
+	log.MainTest(m)
 }
 
 func TestIsPublicIP(t *testing.T) {

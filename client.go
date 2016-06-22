@@ -13,15 +13,15 @@ import (
 
 	"fmt"
 
-	"github.com/dedis/cosi/lib"
+	"github.com/codegangsta/cli"
 	s "github.com/dedis/cosi/service"
-	"gopkg.in/codegangsta/cli.v1"
-	"gopkg.in/dedis/cothority.v0/lib/config"
-	"gopkg.in/dedis/cothority.v0/lib/crypto"
-	"gopkg.in/dedis/cothority.v0/lib/dbg"
-	"gopkg.in/dedis/cothority.v0/lib/network"
-	"gopkg.in/dedis/cothority.v0/lib/sda"
-	"gopkg.in/dedis/crypto.v0/abstract"
+	"github.com/dedis/cothority/app/lib/config"
+	"github.com/dedis/cothority/crypto"
+	"github.com/dedis/cothority/log"
+	"github.com/dedis/cothority/network"
+	"github.com/dedis/cothority/sda"
+	"github.com/dedis/crypto/abstract"
+	"github.com/dedis/crypto/cosi"
 )
 
 // checkConfig contacts all servers and verifies if it receives a valid
@@ -30,27 +30,29 @@ func checkConfig(c *cli.Context) error {
 	tomlFileName := c.String(optionGroup)
 	f, err := os.Open(tomlFileName)
 	printErrAndExit("Couldn't open group definition file: %v", err)
-	el, descs, err := config.ReadGroupDescToml(f)
+	group, err := config.ReadGroupDescToml(f)
 	printErrAndExit("Error while reading group definition file: %v", err)
-	if len(el.List) == 0 {
+	if len(group.Roster.List) == 0 {
 		printErrAndExit("Empty entity or invalid group defintion in: %s",
 			tomlFileName)
 	}
 	fmt.Println("[+] Checking the availability and responsiveness of the servers in the group...")
+	r := group.Roster
 	// First check all servers individually
-	for i := range el.List {
-		checkList(sda.NewEntityList(el.List[i:i+1]), descs[i:i+1])
+	for i := range r.List {
+		descs := []string{group.GetDescription(r.List[i]), group.GetDescription(r.List[i+1])}
+		checkList(sda.NewRoster(r.List[i:i+1]), descs)
 	}
-	if len(el.List) > 1 {
+	if len(r.List) > 1 {
 		// Then check pairs of servers
-		for i, first := range el.List {
-			for j, second := range el.List[i+1:] {
-				desc := []string{descs[i], descs[i+j+1]}
-				es := []*network.Entity{first, second}
-				checkList(sda.NewEntityList(es), desc)
+		for i, first := range r.List {
+			for j, second := range r.List[i+1:] {
+				descs := []string{group.GetDescription(r.List[i]), group.GetDescription(r.List[i+j+1])}
+				es := []*network.ServerIdentity{first, second}
+				checkList(sda.NewRoster(es), descs)
 				es[0], es[1] = es[1], es[0]
-				desc[0], desc[1] = desc[1], desc[0]
-				checkList(sda.NewEntityList(es), desc)
+				descs[0], descs[1] = descs[1], descs[0]
+				checkList(sda.NewRoster(es), descs)
 			}
 		}
 	}
@@ -59,13 +61,13 @@ func checkConfig(c *cli.Context) error {
 }
 
 // checkList sends a message to the list and waits for the reply
-func checkList(list *sda.EntityList, descs []string) {
+func checkList(list *sda.Roster, descs []string) {
 	serverStr := ""
 	for i, s := range list.List {
 		name := strings.Split(descs[i], " ")[0]
 		serverStr += fmt.Sprintf("%s_%s ", s.Addresses[0], name)
 	}
-	dbg.Lvl3("Sending message to: " + serverStr)
+	log.Lvl3("Sending message to: " + serverStr)
 	msg := "verification"
 	fmt.Print("[+] Checking server(s) ", serverStr, ": ")
 	sig, err := signStatement(strings.NewReader(msg), list)
@@ -75,7 +77,7 @@ func checkList(list *sda.EntityList, descs []string) {
 	} else {
 		err := verifySignatureHash([]byte(msg), sig, list)
 		if err != nil {
-			fmt.Println(os.Stderr,
+			fmt.Fprintln(os.Stderr,
 				fmt.Sprintf("Invalid signature: %v", err))
 		} else {
 			fmt.Println("Success")
@@ -98,7 +100,7 @@ func signFile(c *cli.Context) error {
 	}
 	sig, err := sign(file, groupToml)
 	printErrAndExit("Couldn't create signature: %v", err)
-	dbg.Lvl3(sig)
+	log.Lvl3(sig)
 	var outFile *os.File
 	outFileName := c.String("out")
 	if outFileName != "" {
@@ -109,7 +111,7 @@ func signFile(c *cli.Context) error {
 	}
 	writeSigAsJSON(sig, outFile)
 	if outFileName != "" {
-		dbg.Lvl2("Signature written to: %s", outFile.Name())
+		log.Lvl2("Signature written to: %s", outFile.Name())
 	} // else keep the Stdout empty
 	return nil
 }
@@ -118,7 +120,7 @@ func verifyFile(c *cli.Context) error {
 	if len(c.Args().First()) == 0 {
 		printErrAndExit("Please give the 'msgFile'", 1)
 	}
-	dbg.SetDebugVisible(c.GlobalInt("debug"))
+	log.SetDebugVisible(c.GlobalInt("debug"))
 	sigOrEmpty := c.String("signature")
 	err := verify(c.Args().First(), sigOrEmpty, c.String(optionGroup))
 	verifyPrintResult(err)
@@ -158,7 +160,7 @@ func printErrAndExit(format string, a ...interface{}) {
 
 // sign takes a stream and a toml file defining the servers
 func sign(r io.Reader, tomlFileName string) (*s.SignatureResponse, error) {
-	dbg.Lvl2("Starting signature")
+	log.Lvl2("Starting signature")
 	f, err := os.Open(tomlFileName)
 	if err != nil {
 		return nil, err
@@ -171,7 +173,7 @@ func sign(r io.Reader, tomlFileName string) (*s.SignatureResponse, error) {
 		return nil, errors.New("Empty or invalid cosi group file:" +
 			tomlFileName)
 	}
-	dbg.Lvl2("Sending signature to", el)
+	log.Lvl2("Sending signature to", el)
 	res, err := signStatement(r, el)
 	if err != nil {
 		return nil, err
@@ -181,7 +183,7 @@ func sign(r io.Reader, tomlFileName string) (*s.SignatureResponse, error) {
 
 // signStatement can be used to sign the contents passed in the io.Reader
 // (pass an io.File or use an strings.NewReader for strings)
-func signStatement(read io.Reader, el *sda.EntityList) (*s.SignatureResponse,
+func signStatement(read io.Reader, el *sda.Roster) (*s.SignatureResponse,
 	error) {
 	publics := entityListToPublics(el)
 	client := s.NewClient()
@@ -190,7 +192,7 @@ func signStatement(read io.Reader, el *sda.EntityList) (*s.SignatureResponse,
 	pchan := make(chan *s.SignatureResponse)
 	var err error
 	go func() {
-		dbg.Lvl3("Waiting for the response on SignRequest")
+		log.Lvl3("Waiting for the response on SignRequest")
 		response, e := client.SignMsg(el, msg)
 		if e != nil {
 			err = e
@@ -202,7 +204,7 @@ func signStatement(read io.Reader, el *sda.EntityList) (*s.SignatureResponse,
 
 	select {
 	case response, ok := <-pchan:
-		dbg.Lvl5("Response:", response)
+		log.Lvl5("Response:", response)
 		if !ok || err != nil {
 			return nil, errors.New("Received an invalid repsonse.")
 		}
@@ -222,13 +224,13 @@ func signStatement(read io.Reader, el *sda.EntityList) (*s.SignatureResponse,
 // assumes to find the standard signature in fileName.sig
 func verify(fileName, sigFileName, groupToml string) error {
 	// if the file hash matches the one in the signature
-	dbg.Lvl4("Reading file " + fileName)
+	log.Lvl4("Reading file " + fileName)
 	b, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		return errors.New("Couldn't open msgFile: " + err.Error())
 	}
 	// Read the JSON signature file
-	dbg.Lvl4("Reading signature")
+	log.Lvl4("Reading signature")
 	var sigBytes []byte
 	if sigFileName == "" {
 		fmt.Println("[+] Reading signature from standard input ...")
@@ -240,7 +242,7 @@ func verify(fileName, sigFileName, groupToml string) error {
 		return err
 	}
 	sig := &s.SignatureResponse{}
-	dbg.Lvl4("Unmarshalling signature ")
+	log.Lvl4("Unmarshalling signature ")
 	if err := json.Unmarshal(sigBytes, sig); err != nil {
 		return err
 	}
@@ -248,17 +250,17 @@ func verify(fileName, sigFileName, groupToml string) error {
 	if err != nil {
 		return err
 	}
-	dbg.Lvl4("Reading group definition")
+	log.Lvl4("Reading group definition")
 	el, err := config.ReadGroupToml(fGroup)
 	if err != nil {
 		return err
 	}
-	dbg.Lvl4("Verfifying signature")
+	log.Lvl4("Verfifying signature")
 	err = verifySignatureHash(b, sig, el)
 	return err
 }
 
-func verifySignatureHash(b []byte, sig *s.SignatureResponse, el *sda.EntityList) error {
+func verifySignatureHash(b []byte, sig *s.SignatureResponse, el *sda.Roster) error {
 	// We have to hash twice, as the hash in the signature is the hash of the
 	// message sent to be signed
 	publics := entityListToPublics(el)
@@ -274,9 +276,9 @@ func verifySignatureHash(b []byte, sig *s.SignatureResponse, el *sda.EntityList)
 	}
 	return nil
 }
-func entityListToPublics(el *sda.EntityList) []abstract.Point {
-	publics := make([]abstract.Point, len(el.List))
-	for i, e := range el.List {
+func entityListToPublics(r *sda.Roster) []abstract.Point {
+	publics := make([]abstract.Point, len(r.List))
+	for i, e := range r.List {
 		publics[i] = e.Public
 	}
 	return publics
