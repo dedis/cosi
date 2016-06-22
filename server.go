@@ -21,6 +21,7 @@ import (
 	"github.com/dedis/cothority/log"
 	"github.com/dedis/cothority/network"
 	"gopkg.in/codegangsta/cli.v1"
+	"github.com/dedis/cothority/log"
 	// Empty imports to have the init-functions called which should
 	// register the protocol
 
