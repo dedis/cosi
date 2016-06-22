@@ -17,7 +17,7 @@ import (
 	s "github.com/dedis/cosi/service"
 	"github.com/dedis/cothority/app/lib/config"
 	"github.com/dedis/cothority/crypto"
-	"github.com/dedis/cothority/dbg"
+	"github.com/dedis/cothority/log"
 	"github.com/dedis/cothority/network"
 	"github.com/dedis/cothority/sda"
 	"github.com/dedis/crypto/abstract"
@@ -67,7 +67,7 @@ func checkList(list *sda.Roster, descs []string) {
 		name := strings.Split(descs[i], " ")[0]
 		serverStr += fmt.Sprintf("%s_%s ", s.Addresses[0], name)
 	}
-	dbg.Lvl3("Sending message to: " + serverStr)
+	log.Lvl3("Sending message to: " + serverStr)
 	msg := "verification"
 	fmt.Print("[+] Checking server(s) ", serverStr, ": ")
 	sig, err := signStatement(strings.NewReader(msg), list)
@@ -100,7 +100,7 @@ func signFile(c *cli.Context) error {
 	}
 	sig, err := sign(file, groupToml)
 	printErrAndExit("Couldn't create signature: %v", err)
-	dbg.Lvl3(sig)
+	log.Lvl3(sig)
 	var outFile *os.File
 	outFileName := c.String("out")
 	if outFileName != "" {
@@ -111,7 +111,7 @@ func signFile(c *cli.Context) error {
 	}
 	writeSigAsJSON(sig, outFile)
 	if outFileName != "" {
-		dbg.Lvl2("Signature written to: %s", outFile.Name())
+		log.Lvl2("Signature written to: %s", outFile.Name())
 	} // else keep the Stdout empty
 	return nil
 }
@@ -120,7 +120,7 @@ func verifyFile(c *cli.Context) error {
 	if len(c.Args().First()) == 0 {
 		printErrAndExit("Please give the 'msgFile'", 1)
 	}
-	dbg.SetDebugVisible(c.GlobalInt("debug"))
+	log.SetDebugVisible(c.GlobalInt("debug"))
 	sigOrEmpty := c.String("signature")
 	err := verify(c.Args().First(), sigOrEmpty, c.String(optionGroup))
 	verifyPrintResult(err)
@@ -160,7 +160,7 @@ func printErrAndExit(format string, a ...interface{}) {
 
 // sign takes a stream and a toml file defining the servers
 func sign(r io.Reader, tomlFileName string) (*s.SignatureResponse, error) {
-	dbg.Lvl2("Starting signature")
+	log.Lvl2("Starting signature")
 	f, err := os.Open(tomlFileName)
 	if err != nil {
 		return nil, err
@@ -173,7 +173,7 @@ func sign(r io.Reader, tomlFileName string) (*s.SignatureResponse, error) {
 		return nil, errors.New("Empty or invalid cosi group file:" +
 			tomlFileName)
 	}
-	dbg.Lvl2("Sending signature to", el)
+	log.Lvl2("Sending signature to", el)
 	res, err := signStatement(r, el)
 	if err != nil {
 		return nil, err
@@ -192,7 +192,7 @@ func signStatement(read io.Reader, el *sda.Roster) (*s.SignatureResponse,
 	pchan := make(chan *s.SignatureResponse)
 	var err error
 	go func() {
-		dbg.Lvl3("Waiting for the response on SignRequest")
+		log.Lvl3("Waiting for the response on SignRequest")
 		response, e := client.SignMsg(el, msg)
 		if e != nil {
 			err = e
@@ -204,7 +204,7 @@ func signStatement(read io.Reader, el *sda.Roster) (*s.SignatureResponse,
 
 	select {
 	case response, ok := <-pchan:
-		dbg.Lvl5("Response:", response)
+		log.Lvl5("Response:", response)
 		if !ok || err != nil {
 			return nil, errors.New("Received an invalid repsonse.")
 		}
@@ -224,13 +224,13 @@ func signStatement(read io.Reader, el *sda.Roster) (*s.SignatureResponse,
 // assumes to find the standard signature in fileName.sig
 func verify(fileName, sigFileName, groupToml string) error {
 	// if the file hash matches the one in the signature
-	dbg.Lvl4("Reading file " + fileName)
+	log.Lvl4("Reading file " + fileName)
 	b, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		return errors.New("Couldn't open msgFile: " + err.Error())
 	}
 	// Read the JSON signature file
-	dbg.Lvl4("Reading signature")
+	log.Lvl4("Reading signature")
 	var sigBytes []byte
 	if sigFileName == "" {
 		fmt.Println("[+] Reading signature from standard input ...")
@@ -242,7 +242,7 @@ func verify(fileName, sigFileName, groupToml string) error {
 		return err
 	}
 	sig := &s.SignatureResponse{}
-	dbg.Lvl4("Unmarshalling signature ")
+	log.Lvl4("Unmarshalling signature ")
 	if err := json.Unmarshal(sigBytes, sig); err != nil {
 		return err
 	}
@@ -250,12 +250,12 @@ func verify(fileName, sigFileName, groupToml string) error {
 	if err != nil {
 		return err
 	}
-	dbg.Lvl4("Reading group definition")
+	log.Lvl4("Reading group definition")
 	el, err := config.ReadGroupToml(fGroup)
 	if err != nil {
 		return err
 	}
-	dbg.Lvl4("Verfifying signature")
+	log.Lvl4("Verfifying signature")
 	err = verifySignatureHash(b, sig, el)
 	return err
 }

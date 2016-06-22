@@ -3,7 +3,7 @@ package service
 import (
 	"errors"
 
-	"github.com/dedis/cothority/dbg"
+	"github.com/dedis/cothority/log"
 	"github.com/dedis/cothority/sda"
 )
 
@@ -26,7 +26,7 @@ func (c *Client) SignMsg(r *sda.Roster, msg []byte) (*SignatureResponse, error) 
 		Message: msg,
 	}
 	dst := r.List[0]
-	dbg.Lvl4("Sending message to", dst)
+	log.Lvl4("Sending message to", dst)
 	reply, err := c.Send(dst, serviceReq)
 	if e := sda.ErrMsg(reply, err); e != nil {
 		return nil, e
