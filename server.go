@@ -18,7 +18,7 @@ import (
 
 	c "github.com/dedis/cothority/app/lib/config"
 	"github.com/dedis/cothority/crypto"
-	"github.com/dedis/cothority/dbg"
+	"github.com/dedis/cothority/log"
 	"github.com/dedis/cothority/network"
 	"gopkg.in/codegangsta/cli.v1"
 	// Empty imports to have the init-functions called which should
@@ -36,13 +36,13 @@ func runServer(ctx *cli.Context) {
 	config := ctx.String("config")
 
 	if _, err := os.Stat(config); os.IsNotExist(err) {
-		dbg.Fatalf("[-] Configuration file does not exist. %s. "+
+		log.Fatalf("[-] Configuration file does not exist. %s. "+
 			"Use `cosi server setup` to create one.", config)
 	}
 	// Let's read the config
 	_, host, err := c.ParseCothorityd(config)
 	if err != nil {
-		dbg.Fatal("Couldn't parse config:", err)
+		log.Fatal("Couldn't parse config:", err)
 	}
 	host.ListenAndBind()
 	host.StartProcessMessages()
@@ -194,7 +194,7 @@ func isPublicIP(ip string) bool {
 		"(^172\\.1[6-9]\\.)|(^172\\.2[0-9]\\.)|"+
 		"(^172\\.3[0-1]\\.)|(^192\\.168\\.)", ip)
 	if err != nil {
-		dbg.Error(err)
+		log.Error(err)
 	}
 	return !public
 }

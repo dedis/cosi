@@ -4,17 +4,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/dedis/cothority/dbg"
+	"github.com/dedis/cothority/log"
 	"github.com/dedis/cothority/network"
 	"github.com/dedis/cothority/sda"
 	"github.com/dedis/crypto/cosi"
 )
 
 func TestCosi(t *testing.T) {
-	//defer dbg.AfterTest(t)
-	dbg.TestOutput(testing.Verbose(), 4)
+	//defer log.AfterTest(t)
+	log.TestOutput(testing.Verbose(), 4)
 	for _, nbrHosts := range []int{1, 3, 13} {
-		dbg.Lvl2("Running cosi with", nbrHosts, "hosts")
+		log.Lvl2("Running cosi with", nbrHosts, "hosts")
 		local := sda.NewLocalTest()
 		hosts, el, tree := local.GenBigTree(nbrHosts, nbrHosts, 3, true, true)
 		aggPublic := network.Suite.Point().Null()

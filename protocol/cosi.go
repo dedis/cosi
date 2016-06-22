@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/dedis/cothority/dbg"
+	"github.com/dedis/cothority/log"
 	"github.com/dedis/cothority/sda"
 	"github.com/dedis/crypto/abstract"
 	"github.com/dedis/crypto/cosi"
@@ -138,7 +138,7 @@ func (c *CoSi) Dispatch() error {
 			return nil
 		}
 		if err != nil {
-			dbg.Error("ProtocolCosi -> err treating incoming:", err)
+			log.Error("ProtocolCosi -> err treating incoming:", err)
 		}
 	}
 }
@@ -161,7 +161,7 @@ func VerifySignature(suite abstract.Suite, publics []abstract.Point, msg, sig []
 // handleAnnouncement will pass the message to the round and send back the
 // output. If in == nil, we are root and we start the round.
 func (c *CoSi) handleAnnouncement(in *Announcement) error {
-	dbg.Lvl3("Message:", c.Message)
+	log.Lvl3("Message:", c.Message)
 	// If we have a hook on announcement call the hook
 	if c.announcementHook != nil {
 		return c.announcementHook()
@@ -190,7 +190,7 @@ func (c *CoSi) handleCommitment(in *Commitment) error {
 			return nil
 		}
 	}
-	dbg.Lvl3(c.Name(), "aggregated")
+	log.Lvl3(c.Name(), "aggregated")
 	// pass it to the hook
 	if c.commitmentHook != nil {
 		return c.commitmentHook(c.tempCommitment)
@@ -220,7 +220,7 @@ func (c *CoSi) startChallenge() error {
 	out := &Challenge{
 		Chall: challenge,
 	}
-	dbg.Lvl3(c.Name(), "Starting Chal=", fmt.Sprintf("%+v", challenge), " (message =", string(c.Message))
+	log.Lvl3(c.Name(), "Starting Chal=", fmt.Sprintf("%+v", challenge), " (message =", string(c.Message))
 	return c.handleChallenge(out)
 
 }
@@ -230,7 +230,7 @@ func (c *CoSi) startChallenge() error {
 func (c *CoSi) handleChallenge(in *Challenge) error {
 	// TODO check hook
 
-	dbg.Lvl3(c.Name(), "chal=", fmt.Sprintf("%+v", in.Chall))
+	log.Lvl3(c.Name(), "chal=", fmt.Sprintf("%+v", in.Chall))
 	// else dispatch it to cosi
 	c.cosi.Challenge(in.Chall)
 
@@ -251,7 +251,7 @@ func (c *CoSi) handleResponse(in *Response) error {
 		c.tempResponse = append(c.tempResponse, in.Resp)
 		c.tempResponseLock.Unlock()
 		// do we have enough ?
-		dbg.Lvl3(c.Name(), "has", len(c.tempResponse), "responses")
+		log.Lvl3(c.Name(), "has", len(c.tempResponse), "responses")
 		if len(c.tempResponse) < len(c.Children()) {
 			return nil
 		}
@@ -262,7 +262,7 @@ func (c *CoSi) handleResponse(in *Response) error {
 		c.Done()
 	}()
 
-	dbg.Lvl3(c.Name(), "aggregated")
+	log.Lvl3(c.Name(), "aggregated")
 	outResponse, err := c.cosi.Response(c.tempResponse)
 	if err != nil {
 		return err
@@ -286,7 +286,7 @@ func (c *CoSi) handleResponse(in *Response) error {
 // SigningMessage simply set the message to sign for this round
 func (c *CoSi) SigningMessage(msg []byte) {
 	c.Message = msg
-	dbg.Lvl2(c.Name(), "Root will sign message=", c.Message)
+	log.Lvl2(c.Name(), "Root will sign message=", c.Message)
 }
 
 // RegisterAnnouncementHook allows for handling what should happen upon an

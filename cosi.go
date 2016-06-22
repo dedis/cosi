@@ -11,7 +11,7 @@ import (
 
 	"os"
 
-	"github.com/dedis/cothority/dbg"
+	"github.com/dedis/cothority/log"
 )
 
 // BinaryName represents the Name of the binary
@@ -46,8 +46,8 @@ const optionConfigShort = "c"
 const RequestTimeOut = time.Second * 10
 
 func init() {
-	dbg.SetDebugVisible(1)
-	dbg.SetUseColors(false)
+	log.SetDebugVisible(1)
+	log.SetUseColors(false)
 }
 
 func main() {
@@ -146,7 +146,7 @@ func main() {
 
 	app.Flags = binaryFlags
 	app.Before = func(c *cli.Context) error {
-		dbg.SetDebugVisible(c.GlobalInt("debug"))
+		log.SetDebugVisible(c.GlobalInt("debug"))
 		return nil
 	}
 	app.Run(os.Args)
