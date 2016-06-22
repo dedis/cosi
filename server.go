@@ -18,6 +18,7 @@ import (
 
 	c "github.com/dedis/cothority/app/lib/config"
 	"github.com/dedis/cothority/crypto"
+	"github.com/dedis/cothority/log"
 	"github.com/dedis/cothority/network"
 	"gopkg.in/codegangsta/cli.v1"
 	"github.com/dedis/cothority/log"
