@@ -59,6 +59,7 @@ type CoSi struct {
 	announcementHook AnnouncementHook
 	commitmentHook   CommitmentHook
 	challengeHook    ChallengeHook
+	responseHook     ResponseHook
 	signatureHook    SignatureHook
 }
 
@@ -66,13 +67,17 @@ type CoSi struct {
 // announcement
 type AnnouncementHook func() error
 
-// CommitmentHook allows for handling what should happen when a
-// commitment is received
+// CommitmentHook allows for handling what should happen when all
+// commitments are received
 type CommitmentHook func(in []abstract.Point) error
 
 // ChallengeHook allows for handling what should happen when a
 // challenge is received
 type ChallengeHook func(ch abstract.Scalar) error
+
+// ResponseHook allows for handling what should happen when all
+// responses are received
+type ResponseHook func(in []abstract.Scalar)
 
 // SignatureHook allows registering a handler when the signature is done
 type SignatureHook func(sig []byte)
@@ -256,6 +261,11 @@ func (c *CoSi) handleResponse(in *Response) error {
 			return nil
 		}
 	}
+
+	if c.responseHook != nil {
+		c.responseHook(c.tempResponse)
+	}
+
 	// protocol is finished
 	defer func() {
 		close(c.done)
@@ -271,6 +281,7 @@ func (c *CoSi) handleResponse(in *Response) error {
 	out := &Response{
 		Resp: outResponse,
 	}
+
 	// send it back to parent
 	if !c.IsRoot() {
 		return c.SendTo(c.Parent(), out)
@@ -307,8 +318,14 @@ func (c *CoSi) RegisterChallengeHook(fn ChallengeHook) {
 	c.challengeHook = fn
 }
 
-// RegisterSignatureHook allows for handling what should happen when a
+// RegisterResponseHook allows for handling what should happen when a
+// response is received
+func (c *CoSi) RegisterResponseHook(fn ResponseHook) {
+	c.responseHook = fn
+}
+
+// RegisterSignatureHook allows for handling what should happen when
 // the protocol is done
-func (c *CoSi) RegisterSignatureHook(fn func(sig []byte)) {
+func (c *CoSi) RegisterSignatureHook(fn SignatureHook) {
 	c.signatureHook = fn
 }
