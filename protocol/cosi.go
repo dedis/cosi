@@ -67,15 +67,16 @@ type CoSi struct {
 // announcement
 type AnnouncementHook func() error
 
-// CommitmentHook allows for handling what should happen when a
-// commitment is received
+// CommitmentHook allows for handling what should happen when all
+// commitments are received
 type CommitmentHook func(in []abstract.Point) error
 
 // ChallengeHook allows for handling what should happen when a
 // challenge is received
 type ChallengeHook func(ch abstract.Scalar) error
 
-// ResponseHook allows registering a handler when the response is calculated
+// ResponseHook allows for handling what should happen when all
+// responses are received
 type ResponseHook func(in []abstract.Scalar)
 
 // SignatureHook allows registering a handler when the signature is done
