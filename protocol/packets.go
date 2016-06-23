@@ -10,13 +10,6 @@ import (
 
 // The main messages used by CoSi
 
-// VerifyResponse sets how the checks are done,
-// see https://github.com/dedis/cothority/issues/260
-// 0 - no check at all
-// 1 - check only at root
-// 2 - check at each level of the tree
-var VerifyResponse = 1
-
 // Announcement is broadcasted message initiated and signed by proposer.
 type Announcement struct {
 }
