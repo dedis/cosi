@@ -28,7 +28,7 @@ func init() {
 }
 
 // Cosi is the service that handles collective signing operations
-type Cosi struct {
+type CoSi struct {
 	*sda.ServiceProcessor
 	path string
 }
@@ -39,22 +39,14 @@ type SignatureRequest struct {
 	Roster  *sda.Roster
 }
 
-// CosiRequestType is the type that is embedded in the Request object for a
-// CosiRequest
-var CosiRequestType = network.RegisterMessageType(SignatureRequest{})
-
 // SignatureResponse is what the Cosi service will reply to clients.
 type SignatureResponse struct {
 	Sum       []byte
 	Signature []byte
 }
 
-// CosiResponseType is the type that is embedded in the Request object for a
-// CosiResponse
-var CosiResponseType = network.RegisterMessageType(SignatureResponse{})
-
 // SignatureRequest treats external request to this service.
-func (cs *Cosi) SignatureRequest(e *network.ServerIdentity, req *SignatureRequest) (network.Body, error) {
+func (cs *CoSi) SignatureRequest(e *network.ServerIdentity, req *SignatureRequest) (network.Body, error) {
 	tree := req.Roster.GenerateBinaryTree()
 	tni := cs.NewTreeNodeInstance(tree, tree.Root, protocol.Name)
 	pi, err := protocol.NewCoSi(tni)
@@ -76,7 +68,7 @@ func (cs *Cosi) SignatureRequest(e *network.ServerIdentity, req *SignatureReques
 	go pi.Dispatch()
 	go pi.Start()
 	sig := <-response
-	if log.DebugVisible() > 0 {
+	if log.DebugVisible() > 1 {
 		fmt.Printf("%s: Signed a message.\n", time.Now().Format("Mon Jan 2 15:04:05 -0700 MST 2006"))
 	}
 	return &SignatureResponse{
@@ -88,7 +80,7 @@ func (cs *Cosi) SignatureRequest(e *network.ServerIdentity, req *SignatureReques
 // NewProtocol is called on all nodes of a Tree (except the root, since it is
 // the one starting the protocol) so it's the Service that will be called to
 // generate the PI on all others node.
-func (cs *Cosi) NewProtocol(tn *sda.TreeNodeInstance, conf *sda.GenericConfig) (sda.ProtocolInstance, error) {
+func (cs *CoSi) NewProtocol(tn *sda.TreeNodeInstance, conf *sda.GenericConfig) (sda.ProtocolInstance, error) {
 	log.Lvl3("Cosi Service received New Protocol event")
 	pi, err := protocol.NewCoSi(tn)
 	go pi.Dispatch()
@@ -96,7 +88,7 @@ func (cs *Cosi) NewProtocol(tn *sda.TreeNodeInstance, conf *sda.GenericConfig) (
 }
 
 func newCosiService(c sda.Context, path string) sda.Service {
-	s := &Cosi{
+	s := &CoSi{
 		ServiceProcessor: sda.NewServiceProcessor(c),
 		path:             path,
 	}

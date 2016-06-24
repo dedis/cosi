@@ -1,2 +1,6 @@
+# Everything that is changing and might break other people's
+# code should be put in here
+160624 - 0.9.1
+	- changed Cosi to CoSi in cosi/service/cosi.go
 160622 - 0.9.0
 	- moved lib/cosi to dedis/crypto
