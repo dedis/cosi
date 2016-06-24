@@ -290,15 +290,9 @@ func (c *CoSi) handleResponse(in *Response) error {
 
 	// we are root, we have the signature now
 	if c.signatureHook != nil {
-		c.signatureHook(c.Signature())
+		c.signatureHook(c.cosi.Signature())
 	}
 	return nil
-}
-
-// Returns the signature of that subtree. Supposes that all commits
-// and responses are calculated
-func (c *CoSi) Signature() []byte {
-	return c.cosi.Signature()
 }
 
 // VerifyResponses allows to check at each intermediate node whether the

@@ -27,7 +27,7 @@ func init() {
 	network.RegisterMessageType(&SignatureResponse{})
 }
 
-// Cosi is the service that handles collective signing operations
+// CoSi is the service that handles collective signing operations
 type CoSi struct {
 	*sda.ServiceProcessor
 	path string
