@@ -1,2 +1,4 @@
+160627 - 0.9.1
+	- using new Context-struct of cothority
 160622 - 0.9.0
 	- moved lib/cosi to dedis/crypto
