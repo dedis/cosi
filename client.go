@@ -13,7 +13,6 @@ import (
 
 	"fmt"
 
-	"github.com/codegangsta/cli"
 	s "github.com/dedis/cosi/service"
 	"github.com/dedis/cothority/app/lib/config"
 	"github.com/dedis/cothority/crypto"
@@ -22,6 +21,7 @@ import (
 	"github.com/dedis/cothority/sda"
 	"github.com/dedis/crypto/abstract"
 	"github.com/dedis/crypto/cosi"
+	"gopkg.in/codegangsta/cli.v1"
 )
 
 // checkConfig contacts all servers and verifies if it receives a valid
