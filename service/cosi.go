@@ -87,7 +87,7 @@ func (cs *CoSi) NewProtocol(tn *sda.TreeNodeInstance, conf *sda.GenericConfig) (
 	return pi, err
 }
 
-func newCoSiService(c sda.Context, path string) sda.Service {
+func newCoSiService(c *sda.Context, path string) sda.Service {
 	s := &CoSi{
 		ServiceProcessor: sda.NewServiceProcessor(c),
 		path:             path,
