@@ -22,7 +22,7 @@ import (
 const ServiceName = "CoSi"
 
 func init() {
-	sda.RegisterNewService(ServiceName, newCosiService)
+	sda.RegisterNewService(ServiceName, newCoSiService)
 	network.RegisterMessageType(&SignatureRequest{})
 	network.RegisterMessageType(&SignatureResponse{})
 }
@@ -87,13 +87,8 @@ func (cs *CoSi) NewProtocol(tn *sda.TreeNodeInstance, conf *sda.GenericConfig) (
 	return pi, err
 }
 
-<<<<<<< HEAD
-func newCosiService(c sda.Context, path string) sda.Service {
+func newCoSiService(c sda.Context, path string) sda.Service {
 	s := &CoSi{
-=======
-func newCosiService(c *sda.Context, path string) sda.Service {
-	s := &Cosi{
->>>>>>> master
 		ServiceProcessor: sda.NewServiceProcessor(c),
 		path:             path,
 	}
