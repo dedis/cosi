@@ -76,7 +76,7 @@ type CommitmentHook func(in []abstract.Point) error
 type ChallengeHook func(ch abstract.Scalar) error
 
 // ResponseHook allows for handling what should happen when all
-// responses are received
+// responses are received and our response is calculated
 type ResponseHook func(in []abstract.Scalar)
 
 // SignatureHook allows registering a handler when the signature is done
@@ -233,11 +233,12 @@ func (c *CoSi) startChallenge() error {
 // handleChallenge dispatch the challenge to the round and then dispatch the
 // results down the tree.
 func (c *CoSi) handleChallenge(in *Challenge) error {
-	// TODO check hook
-
 	log.Lvl3(c.Name(), "chal=", fmt.Sprintf("%+v", in.Chall))
-	// else dispatch it to cosi
 	c.cosi.Challenge(in.Chall)
+
+	if c.challengeHook != nil {
+		c.challengeHook(in.Chall)
+	}
 
 	// if we are leaf, then go to response
 	if c.IsLeaf() {
@@ -262,12 +263,8 @@ func (c *CoSi) handleResponse(in *Response) error {
 		}
 	}
 
-	if c.responseHook != nil {
-		c.responseHook(c.tempResponse)
-	}
-
-	// protocol is finished
 	defer func() {
+		// protocol is finished
 		close(c.done)
 		c.Done()
 	}()
@@ -276,6 +273,10 @@ func (c *CoSi) handleResponse(in *Response) error {
 	outResponse, err := c.cosi.Response(c.tempResponse)
 	if err != nil {
 		return err
+	}
+
+	if c.responseHook != nil {
+		c.responseHook(c.tempResponse)
 	}
 
 	out := &Response{
@@ -292,6 +293,12 @@ func (c *CoSi) handleResponse(in *Response) error {
 		c.signatureHook(c.cosi.Signature())
 	}
 	return nil
+}
+
+// VerifyResponses allows to check at each intermediate node whether the
+// responses are valid
+func (c *CoSi) VerifyResponses(agg abstract.Point) error {
+	return c.cosi.VerifyResponses(agg)
 }
 
 // SigningMessage simply set the message to sign for this round
