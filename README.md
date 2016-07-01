@@ -33,6 +33,12 @@ Do not use it yet for security-critical purposes.  If you use it,
 do so to supplement, rather than replace, existing signing mechanisms.
 Use at your own risk!**
 
+# Versions
+
+There is a v0-version that you can use which is more stable than what is in this development-branch:
+
+https://github.com/dedis/cosi/tree/v0
+
 # Installation
 
 You may install CoSi from either pre-built binaries
