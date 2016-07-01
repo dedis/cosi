@@ -26,9 +26,9 @@ import (
 
 	"regexp"
 
-	"github.com/dedis/cosi/lib"
-	_ "github.com/dedis/cosi/protocol"
-	_ "github.com/dedis/cosi/service"
+	"gopkg.in/dedis/cosi.v0/lib"
+	_ "gopkg.in/dedis/cosi.v0/protocol"
+	_ "gopkg.in/dedis/cosi.v0/service"
 	"gopkg.in/dedis/crypto.v0/config"
 )
 

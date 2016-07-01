@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/dedis/cosi/lib"
+	"gopkg.in/dedis/cosi.v0/lib"
 	"gopkg.in/dedis/crypto.v0/abstract"
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 	"gopkg.in/dedis/cothority.v0/lib/sda"

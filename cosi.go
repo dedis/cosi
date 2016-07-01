@@ -1,7 +1,7 @@
 // CoSi is a scalable protocol for collectively signing messages.
 // CoSi produces compact signatures that clients can verify efficiently,
 // and that convey the precise set of cosigners for transparency.
-// For details see https://github.com/dedis/cosi.
+// For details see https://gopkg.in/dedis/cosi.v0.
 package main
 
 import (

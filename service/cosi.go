@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	libcosi "github.com/dedis/cosi/lib"
-	"github.com/dedis/cosi/protocol"
+	libcosi "gopkg.in/dedis/cosi.v0/lib"
+	"gopkg.in/dedis/cosi.v0/protocol"
 	"gopkg.in/dedis/cothority.v0/lib/crypto"
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 	"gopkg.in/dedis/cothority.v0/lib/network"

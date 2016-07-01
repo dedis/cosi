@@ -13,8 +13,8 @@ import (
 
 	"fmt"
 
-	"github.com/dedis/cosi/lib"
-	s "github.com/dedis/cosi/service"
+	"gopkg.in/dedis/cosi.v0/lib"
+	s "gopkg.in/dedis/cosi.v0/service"
 	"gopkg.in/dedis/crypto.v0/abstract"
 	"gopkg.in/codegangsta/cli.v1"
 	"gopkg.in/dedis/cothority.v0/lib/config"

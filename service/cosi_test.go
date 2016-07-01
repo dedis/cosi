@@ -3,7 +3,7 @@ package cosi
 import (
 	"testing"
 
-	"github.com/dedis/cosi/lib"
+	"gopkg.in/dedis/cosi.v0/lib"
 	"github.com/dedis/cothority/lib/network"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
