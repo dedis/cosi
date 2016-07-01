@@ -264,3 +264,11 @@ See the new [ed25519/cosi] package, with
 [extensive godoc API documentation here](https://godoc.org/github.com/bford/golang-x-crypto/ed25519/cosi).
 Run `go test` to run the standard test suite, and `go test -bench=.` to run a
 suite of performance benchmarks for this package.
+
+# Using CoSi  in your own projects
+
+If you want to include the v0-version of CoSi in your own projects, be sure to use
+
+```
+import "gopkg.in/dedis/cosi.v0
+```
