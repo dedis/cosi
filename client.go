@@ -40,8 +40,8 @@ func checkConfig(c *cli.Context) error {
 	r := group.Roster
 	// First check all servers individually
 	for i := range r.List {
-		descs := []string{group.GetDescription(r.List[i]), group.GetDescription(r.List[i+1])}
-		checkList(sda.NewRoster(r.List[i:i+1]), descs)
+		descs := []string{group.GetDescription(r.List[i]), group.GetDescription(r.List[i])}
+		checkList(sda.NewRoster(r.List[i:i]), descs)
 	}
 	if len(r.List) > 1 {
 		// Then check pairs of servers

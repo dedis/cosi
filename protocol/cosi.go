@@ -304,7 +304,7 @@ func (c *CoSi) VerifyResponses(agg abstract.Point) error {
 // SigningMessage simply set the message to sign for this round
 func (c *CoSi) SigningMessage(msg []byte) {
 	c.Message = msg
-	log.Lvl2(c.Name(), "Root will sign message=", c.Message)
+	log.Lvlf2("%s Root will sign message %x", c.Name(), c.Message)
 }
 
 // RegisterAnnouncementHook allows for handling what should happen upon an
