@@ -18,14 +18,17 @@ software distribution and update services,
 directory services used by tools such as [Tor](https://www.torproject.org),
 and next-generation cryptocurrencies.
 For further background and technical details see this research paper:
-* [Keeping Authorities "Honest or Bust" with Decentralized Witness Cosigning](http://dedis.cs.yale.edu/dissent/papers/witness-abs), [IEEE Security & Privacy 2016](http://www.ieee-security.org/TC/SP2016/).
+* [Keeping Authorities "Honest or Bust" with Decentralized Witness Cosigning](http://dedis.cs.yale.edu/dissent/papers/witness-abs), 
+[IEEE Security & Privacy 2016](http://www.ieee-security.org/TC/SP2016/).
 
 For questions and discussions please join the
 [mailing list](https://groups.google.com/forum/#!forum/cothority).
 
 Other related papers:
-* [Certificate Cothority - Towards Trustworthy Collective CAs](https://petsymposium.org/2015/papers/syta-cc-hotpets2015.pdf), [HotPETS 2015](https://petsymposium.org/2015/hotpets.php)
-* [Enhancing Bitcoin Security and Performance with Strong Consistency via Collective Signing](http://arxiv.org/abs/1602.06997), [USENIX Security 2016](https://www.usenix.org/conference/usenixsecurity16) (to appear)
+* [Certificate Cothority - Towards Trustworthy Collective CAs](https://petsymposium.org/2015/papers/syta-cc-hotpets2015.pdf), 
+[HotPETS 2015](https://petsymposium.org/2015/hotpets.php)
+* [Enhancing Bitcoin Security and Performance with Strong Consistency via Collective Signing](http://arxiv.org/abs/1602.06997), 
+[USENIX Security 2016](https://www.usenix.org/conference/usenixsecurity16) (to appear)
  
 
 **Warning: This software is experimental and still under development.
@@ -46,15 +49,16 @@ https://github.com/dedis/cosi/tree/v0
 If you write code that uses our library in the v0-version, be sure to reference it as
 
 ```
-import "gopkg.in/dedis/cosi.v0
+import "gopkg.in/dedis/cosi.v0"
 ```
 
 ## Master
 
-The master-branch is used for day-to-day development and will break your code about once a week. If you are using this branch, be sure to do
+The master-branch is used for day-to-day development and will break your 
+code about once a week. If you are using this branch, be sure to do
 
 ```
-go get -u ./...
+go get -u -t ./...
 ```
 
 from time to time, as all dedis-dependencies change quite often.
