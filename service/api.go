@@ -10,7 +10,7 @@ import (
 // Client is a structure to communicate with the CoSi
 // service
 type Client struct {
-	*sda.Client
+	sda.Client
 }
 
 // NewClient instantiates a new cosi.Client

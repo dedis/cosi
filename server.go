@@ -44,10 +44,7 @@ func runServer(ctx *cli.Context) {
 	if err != nil {
 		log.Fatal("Couldn't parse config:", err)
 	}
-	host.ListenAndBind()
-	host.StartProcessMessages()
-	host.WaitForClose()
-
+	host.Run()
 }
 
 // interactiveConfig will ask through the command line to create a Private / Public
