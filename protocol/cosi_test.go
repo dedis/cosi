@@ -17,7 +17,7 @@ func TestCosi(t *testing.T) {
 	for _, nbrHosts := range []int{1, 3, 13} {
 		log.Lvl2("Running cosi with", nbrHosts, "hosts")
 		local := sda.NewLocalTest()
-		hosts, el, tree := local.GenTestBigTree(nbrHosts, nbrHosts, 3, true, true)
+		hosts, el, tree := local.GenBigTree(nbrHosts, nbrHosts, 3, true, true)
 		aggPublic := network.Suite.Point().Null()
 		for _, e := range el.List {
 			aggPublic = aggPublic.Add(aggPublic, e.Public)
