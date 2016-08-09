@@ -23,8 +23,8 @@ const ServiceName = "CoSi"
 
 func init() {
 	sda.RegisterNewService(ServiceName, newCoSiService)
-	network.RegisterMessageType(&SignatureRequest{})
-	network.RegisterMessageType(&SignatureResponse{})
+	network.RegisterPacketType(&SignatureRequest{})
+	network.RegisterPacketType(&SignatureResponse{})
 }
 
 // CoSi is the service that handles collective signing operations
