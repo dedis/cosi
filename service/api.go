@@ -25,6 +25,9 @@ func (c *Client) SignMsg(r *sda.Roster, msg []byte) (*SignatureResponse, error) 
 		Roster:  r,
 		Message: msg,
 	}
+	if len(r.List) == 0{
+		return nil, errors.New("Got an empty roster-list")
+	}
 	dst := r.List[0]
 	log.Lvl4("Sending message to", dst)
 	reply, err := c.Send(dst, serviceReq)
