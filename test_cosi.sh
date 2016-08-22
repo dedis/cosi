@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 
-# Set to a non-empty value to print debugging messages
-DBG_RUN=1
-. $GOPATH/src/gopkg.in/dedis/cothority.v0/app/libtest.sh
+DBG_SHOW=1
+# Debug-level for app
+DBG_APP=2
+# Uncomment to build in local dir
 STATICDIR=test
+
+. $GOPATH/src/github.com/dedis/cothority/app/lib/test/libtest.sh
+. $GOPATH/src/github.com/dedis/cothority/app/lib/test/cothorityd.sh
 
 tails=8
 
@@ -21,14 +25,14 @@ main(){
 testReconnect(){
     for s in 1 2; do
         setupServers 1
-        dbgRun "Running first sign"
+        testOut "Running first sign"
         echo "My Test Message File" > foo.txt
         testOK runCl 1 sign foo.txt
-        dbgRun "Killing server $s"
+        testOut "Killing server $s"
         pkill -f "c srv$s/config"
         testFail runCl 1 sign foo.txt
-        dbgRun "Starting server $s again"
-        runSrv $s &
+        testOut "Starting server $s again"
+        runSrv $s
         sleep 1
         testOK runCl 1 sign foo.txt
         pkill -f ./cosi
@@ -76,16 +80,16 @@ setupServers(){
     runSrvCfg 2 
     echo >> $SERVERS
     tail -n 4 srv2/group.toml >> $SERVERS
-    runSrv 1 &
-    runSrv 2 &
+    runSrv 1
+    runSrv 2
     OUT=$OOUT
 }
 
 runCl(){
-    D=cl$1/servers.toml
+    local D=cl$1/servers.toml
     shift
     echo "Running Client with $D $@"
-    ./cosi $@ -g $D
+    dbgRun ./cosi $@ -g $D
 }
 
 runSrvCfg(){
@@ -93,7 +97,7 @@ runSrvCfg(){
 }
 
 runSrv(){
-    ./cosi -d $DBG_SRV server -c srv$1/config.toml
+    ( ./cosi -d $DBG_SRV server -c srv$1/config.toml & )
 }
 
 build(){
@@ -122,6 +126,8 @@ build(){
 if [ "$1" == "-q" ]; then
   DBG_RUN=
   STATICDIR=
+elif [ "$1" ]; then
+  rm -f $STATICDIR/cosi
 fi
 
 main
