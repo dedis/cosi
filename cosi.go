@@ -7,7 +7,7 @@ package main
 import (
 	"time"
 
-	"gopkg.in/codegangsta/cli.v1"
+	"gopkg.in/urfave/cli.v1"
 
 	"os"
 
@@ -149,5 +149,6 @@ func main() {
 		log.SetDebugVisible(c.GlobalInt("debug"))
 		return nil
 	}
-	app.Run(os.Args)
+	err := app.Run(os.Args)
+	log.ErrFatal(err)
 }

@@ -18,14 +18,17 @@ software distribution and update services,
 directory services used by tools such as [Tor](https://www.torproject.org),
 and next-generation cryptocurrencies.
 For further background and technical details see this research paper:
-* [Keeping Authorities "Honest or Bust" with Decentralized Witness Cosigning](http://dedis.cs.yale.edu/dissent/papers/witness-abs), [IEEE Security & Privacy 2016](http://www.ieee-security.org/TC/SP2016/).
+* [Keeping Authorities "Honest or Bust" with Decentralized Witness Cosigning](http://dedis.cs.yale.edu/dissent/papers/witness-abs), 
+[IEEE Security & Privacy 2016](http://www.ieee-security.org/TC/SP2016/).
 
 For questions and discussions please join the
 [mailing list](https://groups.google.com/forum/#!forum/cothority).
 
 Other related papers:
-* [Certificate Cothority - Towards Trustworthy Collective CAs](https://petsymposium.org/2015/papers/syta-cc-hotpets2015.pdf), [HotPETS 2015](https://petsymposium.org/2015/hotpets.php)
-* [Enhancing Bitcoin Security and Performance with Strong Consistency via Collective Signing](http://arxiv.org/abs/1602.06997), [USENIX Security 2016](https://www.usenix.org/conference/usenixsecurity16) (to appear)
+* [Certificate Cothority - Towards Trustworthy Collective CAs](https://petsymposium.org/2015/papers/syta-cc-hotpets2015.pdf), 
+[HotPETS 2015](https://petsymposium.org/2015/hotpets.php)
+* [Enhancing Bitcoin Security and Performance with Strong Consistency via Collective Signing](http://arxiv.org/abs/1602.06997), 
+[USENIX Security 2016](https://www.usenix.org/conference/usenixsecurity16) (to appear)
  
 
 **Warning: This software is experimental and still under development.
@@ -46,15 +49,16 @@ https://github.com/dedis/cosi/tree/v0
 If you write code that uses our library in the v0-version, be sure to reference it as
 
 ```
-import "gopkg.in/dedis/cosi.v0
+import "gopkg.in/dedis/cosi.v0"
 ```
 
 ## Master
 
-The master-branch is used for day-to-day development and will break your code about once a week. If you are using this branch, be sure to do
+The master-branch is used for day-to-day development and will break your 
+code about once a week. If you are using this branch, be sure to do
 
 ```
-go get -u ./...
+go get -u -t ./...
 ```
 
 from time to time, as all dedis-dependencies change quite often.
@@ -255,6 +259,37 @@ If there are connectivity problems,
 due to firewalls or bad connections for example,
 you will see a "Timeout on signing" or similar error message.
 
+### Publicly available DeDiS-CoSi-servers
+
+For the moment there are four publicly available signing-servers, without
+any guarantee that they'll be running. But you can try the following:
+
+```bash
+cat > servers.toml <<EOF
+
+[[servers]]
+  Addresses = ["78.46.227.60:2000"]
+  Public = "2juBRFikJLTgZLVp5UV4LBJ2GSQAm8PtBcNZ6ivYZnA="
+  Description = "Profeda CoSi server"
+
+[[servers]]
+ Addresses = ["5.135.161.91:2000"]
+ Public = "jJq4W8KaIFbDu4snOm1TrtrtG79sZK0VCgshkUohycA="
+ Description = "Nikkolasg's server"
+
+[[servers]]
+  Addresses = ["185.26.156.40:61117"]
+  Public = "XEe5N57Ar3gd6uzvZR9ol2XopBlAQl6rKCbPefnWYdI="
+  Description = "Ismail's server"
+
+[[servers]]
+  Addresses = ["95.143.172.241:62306"]
+  Public = "ag5YGeVtw3m7bIGF57X+n1X3qrHxOnpbaWBpEBT4COc="
+  Description = "Daeinar's server"
+EOF
+```
+
+And use the created servers.toml for signing your messages and files.
 
 # Standalone Language-specific Verification/Signing Modules
 
