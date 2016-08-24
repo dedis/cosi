@@ -15,6 +15,7 @@ install:
 test_fmt:
 	@echo Checking correct formatting of files
 	@{ \
+	cd -P .; \
 	files=$$( go fmt ./... ); \
 	if [ -n "$$files" ]; then \
 		echo "Files not properly formatted: $$files"; \
@@ -28,6 +29,7 @@ test_fmt:
 test_lint:
 	@echo Checking linting of files
 	@{ \
+	cd -P .; \
 	go get github.com/golang/lint/golint; \
 	exclude="_test.go"; \
 	lintfiles=$$( golint ./... | egrep -v "($$exclude)" ); \
