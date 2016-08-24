@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-DBG_SHOW=1
+DBG_SHOW=2
 # Debug-level for app
 DBG_APP=2
 # Uncomment to build in local dir
@@ -42,6 +42,9 @@ testReconnect(){
 testCheck(){
     setupServers 1
     testOK runCl 1 check
+    runSrvCfg 3
+    tail -n 4 srv3/group.toml >> cl1/servers.toml
+    testFail runCl 1 check
 }
 
 testSignFile(){
@@ -89,7 +92,7 @@ runCl(){
     local D=cl$1/servers.toml
     shift
     echo "Running Client with $D $@"
-    dbgRun ./cosi $@ -g $D
+    dbgRun ./cosi -d $DBG_APP $@ -g $D
 }
 
 runSrvCfg(){
