@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func NewTestClient() *Client {
-	return &Client{Client: sda.NewLocalClient(ServiceName)}
+func NewTestClient(l *sda.LocalTest) *Client {
+	return &Client{Client: l.NewClient(ServiceName)}
 }
 
 func TestServiceCosi(t *testing.T) {
@@ -23,7 +23,7 @@ func TestServiceCosi(t *testing.T) {
 	defer local.CloseAll()
 
 	// Send a request to the service
-	client := NewTestClient()
+	client := NewTestClient(local)
 	msg := []byte("hello cosi service")
 	log.Lvl1("Sending request to service...")
 	res, err := client.SignMsg(el, msg)
