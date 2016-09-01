@@ -46,7 +46,7 @@ type SignatureResponse struct {
 }
 
 // SignatureRequest treats external request to this service.
-func (cs *CoSi) SignatureRequest(e *network.ServerIdentity, req *SignatureRequest) (network.Body, error) {
+func (cs *CoSi) SignatureRequest(si *network.ServerIdentity, req *SignatureRequest) (network.Body, error) {
 	tree := req.Roster.GenerateBinaryTree()
 	tni := cs.NewTreeNodeInstance(tree, tree.Root, protocol.Name)
 	pi, err := protocol.NewCoSi(tni)

@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"strings"
 
 	"errors"
 	"time"
@@ -15,13 +14,14 @@ import (
 
 	s "github.com/dedis/cosi/service"
 	"github.com/dedis/cothority/app/lib/config"
+	"github.com/dedis/cothority/app/lib/server"
 	"github.com/dedis/cothority/crypto"
 	"github.com/dedis/cothority/log"
 	"github.com/dedis/cothority/network"
 	"github.com/dedis/cothority/sda"
 	"github.com/dedis/crypto/abstract"
 	"github.com/dedis/crypto/cosi"
-	"gopkg.in/codegangsta/cli.v1"
+	"gopkg.in/urfave/cli.v1"
 )
 
 // checkConfig contacts all servers and verifies if it receives a valid
@@ -33,58 +33,9 @@ func checkConfig(c *cli.Context) error {
 	group, err := config.ReadGroupDescToml(f)
 	log.Print("Size of group desc toml:", len(group.Roster.List))
 	printErrAndExit("Error while reading group definition file: %v", err)
-	if len(group.Roster.List) == 0 {
-		printErrAndExit("Empty entity or invalid group defintion in: %s",
-			tomlFileName)
-	}
-	fmt.Println("[+] Checking the availability and responsiveness of the servers in the group...")
-	r := group.Roster
-	// First check all servers individually
-	for i := range r.List {
-		descs := []string{group.GetDescription(r.List[i]), group.GetDescription(r.List[i+1])}
-		checkList(sda.NewRoster(r.List[i:i+1]), descs)
-	}
-	if len(r.List) > 1 {
-		// Then check pairs of servers
-		for i, first := range r.List {
-			for j, second := range r.List[i+1:] {
-				descs := []string{group.GetDescription(r.List[i]), group.GetDescription(r.List[i+j+1])}
-				es := []*network.ServerIdentity{first, second}
-				checkList(sda.NewRoster(es), descs)
-				es[0], es[1] = es[1], es[0]
-				descs[0], descs[1] = descs[1], descs[0]
-				checkList(sda.NewRoster(es), descs)
-			}
-		}
-	}
-
-	return nil
-}
-
-// checkList sends a message to the list and waits for the reply
-func checkList(list *sda.Roster, descs []string) {
-	serverStr := ""
-	for i, s := range list.List {
-		name := strings.Split(descs[i], " ")[0]
-		serverStr += fmt.Sprintf("%s_%s ", s.Address, name)
-	}
-	log.Lvl3("Sending message to: " + serverStr)
-	msg := "verification"
-	fmt.Print("[+] Checking server(s) ", serverStr, ": ")
-	sig, err := signStatement(strings.NewReader(msg), list)
-	if err != nil {
-		fmt.Fprintln(os.Stderr,
-			fmt.Sprintf("Error '%v'", err))
-	} else {
-		err := verifySignatureHash([]byte(msg), sig, list)
-		if err != nil {
-			fmt.Fprintln(os.Stderr,
-				fmt.Sprintf("Invalid signature: %v", err))
-		} else {
-			fmt.Println("Success")
-		}
-	}
-
+	err = server.CheckServers(group)
+	log.Print("server CheckServers err:", err)
+	return err
 }
 
 // signFile will search for the file and sign it

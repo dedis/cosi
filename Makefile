@@ -1,44 +1,36 @@
-install_dev:
-	@echo Installing development-branch of crypto and cothority
-	@for r in crypto cothority; do \
-		repo=github.com/dedis/$$r; \
-		go get $$repo; \
-		cd $$GOPATH/src/$$repo; \
-		git checkout development; \
-	done
-	@cd $$GOPATH/src/github.com/dedis/cosi
-	go get -t ./...
-
-install:
-	go get -t -v ./...
-
 test_fmt:
 	@echo Checking correct formatting of files
 	@{ \
-	files=$$( go fmt ./... ); \
-	if [ -n "$$files" ]; then \
+		files=$$( go fmt ./... ); \
+		if [ -n "$$files" ]; then \
 		echo "Files not properly formatted: $$files"; \
 		exit 1; \
-	fi; \
-	if ! go vet ./...; then \
+		fi; \
+		if ! go vet ./...; then \
 		exit 1; \
-	fi \
+		fi \
 	}
 
 test_lint:
 	@echo Checking linting of files
 	@{ \
-	go get github.com/golang/lint/golint; \
-	exclude="_test.go"; \
-	lintfiles=$$( golint ./... | egrep -v "($$exclude)" ); \
-	if [ -n "$$lintfiles" ]; then \
+		go get -u github.com/golang/lint/golint; \
+		exclude="protocols/byzcoin|_test.go"; \
+		lintfiles=$$( golint ./... | egrep -v "($$exclude)" ); \
+		if [ -n "$$lintfiles" ]; then \
 		echo "Lint errors:"; \
 		echo "$$lintfiles"; \
 		exit 1; \
-	fi \
+		fi \
 	}
 
-test: test_fmt test_lint
-	go test -race -p=1 ./...
+test_verbose:
+	go test -v -race -short ./...
+
+# use test_verbose instead if you want to use this Makefile locally
+test_go:
+	./coveralls.sh
+
+test: test_fmt test_lint test_go
 
 all: install test

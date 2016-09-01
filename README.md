@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/dedis/cosi.svg?branch=master)](https://travis-ci.org/dedis/cosi)
+[![Coverage Status](https://coveralls.io/repos/github/dedis/cosi/badge.svg?branch=master)](https://coveralls.io/github/dedis/cosi?branch=master)
+
+
 # CoSi
 
 This repository implements the CoSi protocol for scalable collective signing.

@@ -20,7 +20,7 @@ import (
 	"github.com/dedis/cothority/crypto"
 	"github.com/dedis/cothority/log"
 	"github.com/dedis/cothority/network"
-	"gopkg.in/codegangsta/cli.v1"
+	"gopkg.in/urfave/cli.v1"
 	// Empty imports to have the init-functions called which should
 	// register the protocol
 
