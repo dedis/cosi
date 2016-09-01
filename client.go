@@ -31,6 +31,7 @@ func checkConfig(c *cli.Context) error {
 	f, err := os.Open(tomlFileName)
 	printErrAndExit("Couldn't open group definition file: %v", err)
 	group, err := config.ReadGroupDescToml(f)
+	log.Print("Size of group desc toml:", len(group.Roster.List))
 	printErrAndExit("Error while reading group definition file: %v", err)
 	if len(group.Roster.List) == 0 {
 		printErrAndExit("Empty entity or invalid group defintion in: %s",
@@ -65,7 +66,7 @@ func checkList(list *sda.Roster, descs []string) {
 	serverStr := ""
 	for i, s := range list.List {
 		name := strings.Split(descs[i], " ")[0]
-		serverStr += fmt.Sprintf("%s_%s ", s.Addresses[0], name)
+		serverStr += fmt.Sprintf("%s_%s ", s.Address, name)
 	}
 	log.Lvl3("Sending message to: " + serverStr)
 	msg := "verification"

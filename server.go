@@ -44,7 +44,7 @@ func runServer(ctx *cli.Context) {
 	if err != nil {
 		log.Fatal("Couldn't parse config:", err)
 	}
-	host.Run()
+	host.Start()
 }
 
 // interactiveConfig will ask through the command line to create a Private / Public
@@ -60,7 +60,7 @@ func interactiveConfig() {
 	var hostStr string
 	var ipProvided = true
 	var portStr string
-	var serverBinding string
+	var serverBinding network.Address
 	splitted := strings.Split(str, ":")
 
 	if str == "" {
@@ -81,20 +81,16 @@ func interactiveConfig() {
 		portStr = splitted[1]
 	}
 	// let's check if they are correct
-	serverBinding = hostStr + ":" + portStr
-	hostStr, portStr, err := net.SplitHostPort(serverBinding)
-	if err != nil {
-		stderrExit("[-] Invalid connection information for %s: %v", serverBinding, err)
-	}
-	if net.ParseIP(hostStr) == nil {
-		stderrExit("[-] Invalid connection  information for %s", serverBinding)
+	serverBinding = network.NewTCPAddress(hostStr + ":" + portStr)
+	if !serverBinding.Valid() {
+		stderrExit("[-] Invalid connection information for %s", serverBinding)
 	}
 
 	fmt.Println("[+] We now need to get a reachable address for other CoSi servers")
 	fmt.Println("    and clients to contact you. This address will be put in a group definition")
 	fmt.Println("    file that you can share and combine with others to form a Cothority roster.")
 
-	var publicAddress string
+	var publicAddress network.Address
 	var failedPublic bool
 	// if IP was not provided then let's get the public IP address
 	if !ipProvided {
@@ -110,7 +106,7 @@ func interactiveConfig() {
 				stderr("[-] Could not parse your public IP address", err)
 				failedPublic = true
 			} else {
-				publicAddress = strings.TrimSpace(string(buff)) + ":" + portStr
+				publicAddress = network.NewTCPAddress(strings.TrimSpace(string(buff)) + ":" + portStr)
 			}
 		}
 	} else {
@@ -138,9 +134,9 @@ func interactiveConfig() {
 	// create the keys
 	privStr, pubStr := createKeyPair()
 	conf := &c.CothoritydConfig{
-		Public:    pubStr,
-		Private:   privStr,
-		Addresses: []string{serverBinding},
+		Public:  pubStr,
+		Private: privStr,
+		Address: serverBinding,
 	}
 
 	var configDone bool
@@ -186,10 +182,10 @@ func interactiveConfig() {
 	fmt.Println("[+] We're done! Have good time using CoSi :)")
 }
 
-func isPublicIP(ip string) bool {
+func isPublicIP(ip network.Address) bool {
 	public, err := regexp.MatchString("(^127\\.)|(^10\\.)|"+
 		"(^172\\.1[6-9]\\.)|(^172\\.2[0-9]\\.)|"+
-		"(^172\\.3[0-1]\\.)|(^192\\.168\\.)", ip)
+		"(^172\\.3[0-1]\\.)|(^192\\.168\\.)", ip.NetworkAddress())
 	if err != nil {
 		log.Error(err)
 	}
@@ -286,12 +282,12 @@ func readString(reader *bufio.Reader) string {
 	return strings.TrimSpace(str)
 }
 
-func askReachableAddress(reader *bufio.Reader, port string) string {
+func askReachableAddress(reader *bufio.Reader, port string) network.Address {
 	fmt.Println("[*] Enter the IP address you would like others cothority servers and client to contact you.")
 	fmt.Print("[*] Type <Enter> to use the default address [ " + DefaultAddress + " ] if you plan to do local experiments:")
 	ipStr := readString(reader)
 	if ipStr == "" {
-		return DefaultAddress + ":" + port
+		return network.NewTCPAddress(DefaultAddress + ":" + port)
 	}
 
 	splitted := strings.Split(ipStr, ":")
@@ -309,7 +305,7 @@ func askReachableAddress(reader *bufio.Reader, port string) string {
 		// add the port
 		ipStr = ipStr + ":" + port
 	}
-	return ipStr
+	return network.NewTCPAddress(ipStr)
 }
 
 // Service used to get the port connection service
@@ -319,12 +315,12 @@ const whatsMyIP = "http://www.whatsmyip.org/"
 // connect to it. binding is the address where we must listen (needed because
 // the reachable address might not be the same as the binding address => NAT, ip
 // rules etc).
-func tryConnect(ip string, binding string) error {
+func tryConnect(ip, binding network.Address) error {
 
 	stopCh := make(chan bool, 1)
 	// let's bind
 	go func() {
-		ln, err := net.Listen("tcp", binding)
+		ln, err := net.Listen("tcp", binding.NetworkAddress())
 		if err != nil {
 			fmt.Println("[-] Trouble with binding to the address:", err)
 			return
@@ -335,10 +331,7 @@ func tryConnect(ip string, binding string) error {
 	}()
 	defer func() { stopCh <- true }()
 
-	_, port, err := net.SplitHostPort(ip)
-	if err != nil {
-		return err
-	}
+	port := ip.Port()
 	values := url.Values{}
 	values.Set("port", port)
 	values.Set("timeout", "default")
