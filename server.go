@@ -38,11 +38,11 @@ func runServer(ctx *cli.Context) {
 			"Use `cosi server setup` to create one.", config)
 	}
 	// Let's read the config
-	_, host, err := c.ParseCothorityd(config)
+	_, conode, err := c.ParseCothorityd(config)
 	if err != nil {
 		log.Fatal("Couldn't parse config:", err)
 	}
-	host.Start()
+	conode.Start()
 }
 
 // interactiveConfig will ask through the command line to create a Private / Public
@@ -115,7 +115,7 @@ func interactiveConfig() {
 	if failedPublic {
 		publicAddress = askReachableAddress(reader, portStr)
 	} else {
-		if isPublicIP(publicAddress) {
+		if publicAddress.Public() {
 			// try  to connect to ipfound:portgiven
 			tryIP := publicAddress
 			fmt.Println("[+] Check if the address", tryIP, "is reachable from Internet...")
