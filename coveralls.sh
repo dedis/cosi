@@ -13,6 +13,7 @@ if [[ $BRANCH =~ $pattern ]]; then
     go get -d $repo
     cd $GOPATH/src/$repo
     git checkout -f $BRANCH
+    go get -t ./...
     echo $(git rev-parse --abbrev-ref HEAD)
 fi
 echo "Using branch $BRANCH"
