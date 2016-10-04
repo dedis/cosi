@@ -6,6 +6,10 @@ DIR_SOURCE="$(find . -maxdepth 10 -type f -not -path '*/vendor*' -name '*.go' | 
 
 BRANCH=$TRAVIS_PULL_REQUEST_BRANCH
 
+if [[ $BRANCH -eq ""]]; then
+    BRANCH=$TRAVIS_BRANCH
+fi
+
 pattern="refactor_*"
 if [[ $BRANCH =~ $pattern ]]; then 
     echo "Using refactored branch $BRANCH - fetching cothority"
@@ -13,7 +17,6 @@ if [[ $BRANCH =~ $pattern ]]; then
     go get -d $repo
     cd $GOPATH/src/$repo
     git checkout -f $BRANCH
-    go get -t ./...
     echo $(git rev-parse --abbrev-ref HEAD)
 fi
 echo "Using branch $BRANCH"
