@@ -17,7 +17,9 @@ if [[ $BRANCH =~ $pattern ]]; then
     echo $(git rev-parse --abbrev-ref HEAD)
 fi
 echo "Using branch $BRANCH"
+
 cd $TRAVIS_BUILD_DIR
+go get -t ./...
 
 # Run test coverage on each subdirectories and merge the coverage profile.
 all_tests_passed=true
