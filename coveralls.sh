@@ -6,7 +6,7 @@ DIR_SOURCE="$(find . -maxdepth 10 -type f -not -path '*/vendor*' -name '*.go' | 
 
 BRANCH=$TRAVIS_PULL_REQUEST_BRANCH
 
-if [[ $BRANCH -eq ""]]; then
+if [[ -z $BRANCH ]]; then
     BRANCH=$TRAVIS_BRANCH
 fi
 
