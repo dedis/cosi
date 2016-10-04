@@ -5,7 +5,6 @@ DIR_SOURCE="$(find . -maxdepth 10 -type f -not -path '*/vendor*' -name '*.go' | 
 
 
 BRANCH=$TRAVIS_PULL_REQUEST_BRANCH
-echo "Using branch $BRANCH"
 
 pattern="refactor_*"
 if [[ $BRANCH =~ $pattern ]]; then 
@@ -16,7 +15,7 @@ if [[ $BRANCH =~ $pattern ]]; then
     git checkout -f $BRANCH
     echo $(git rev-parse --abbrev-ref HEAD)
 fi
-
+echo "Using branch $BRANCH"
 cd $TRAVIS_BUILD_DIR
 
 # Run test coverage on each subdirectories and merge the coverage profile.
