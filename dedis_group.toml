@@ -1,27 +1,10 @@
-Description = "Default Dedis Cosi servers"
+[[servers]]
+  Addresses = ["192.33.210.8:7770"]
+  Public = "4hTS82jGVO3DUnPyoUJjdh43ypDSwIpyOjCEXpNUfsA="
+  Description = "EPFL - Cosi > v0"
+
 
 [[servers]]
- Addresses = ["5.135.161.91:2000"]
- Public = "lLglU3nhHfUWe4p647hffn618TiUq+6FvTGzJw8eTGU="
- Description = "Nikkolasg's server: spreading the love of signing"
-
-[[servers]]
-  Addresses = ["185.26.156.40:61117"]
-  Public = "apIWOKSt6JcOvNnjcVcPCNcaJJh/kPEjkbn2xSW+W+Q="
-  Description = "Ismail's server"
-
-[[servers]]
-  Addresses = ["78.46.227.60:2000"]
-  Public = "sWhBLrvgwDBwb4gsvQEqp38o1xXEuko5rjy8AqrlNWg="
-  Description = "Ineiti's server"
-
-[[servers]]
-  Addresses = ["95.143.172.241:62306"]
-  Public = "DPciH3z3rGwEMDTaIAV/yExResGBLKhNG2As6tKIDV4="
-  Description = "Daeinar's server"
-
-[[servers]]
-  Addresses = ["192.33.210.8:6879"]
-  Public = "GDM8DlweNi9RL96mFEtQqM9qBnsm/GCW5SgWD98C2VU="
-  Description = "EPFL CoSi server"
-
+  Addresses = ["78.46.227.60:7770"]
+  Public = "QcCaUXcNt6sM02s5dm+gPl0mLQ6BHE9g5I0BPMvj6l8="
+  Description = "Profeda - Cosi > v0"
