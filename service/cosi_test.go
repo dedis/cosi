@@ -9,17 +9,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func NewTestClient(l *sda.LocalTest) *Client {
+	return &Client{Client: l.NewClient(ServiceName)}
+}
+
 func TestServiceCosi(t *testing.T) {
 	defer log.AfterTest(t)
 	log.TestOutput(testing.Verbose(), 4)
 	local := sda.NewLocalTest()
 	// generate 5 hosts, they don't connect, they process messages, and they
 	// don't register the tree or entitylist
-	hosts, el, _ := local.GenTree(5, false, true, false)
+	hosts, el, _ := local.GenTree(5, false)
 	defer local.CloseAll()
 
 	// Send a request to the service
-	client := NewClient()
+	client := NewTestClient(local)
 	msg := []byte("hello cosi service")
 	log.Lvl1("Sending request to service...")
 	res, err := client.SignMsg(el, msg)

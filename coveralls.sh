@@ -3,8 +3,28 @@
 
 DIR_SOURCE="$(find . -maxdepth 10 -type f -not -path '*/vendor*' -name '*.go' | xargs -I {} dirname {} | sort | uniq)"
 
-# Run test coverage on each subdirectories and merge the coverage profile.
 
+BRANCH=$TRAVIS_PULL_REQUEST_BRANCH
+
+if [[ -z $BRANCH ]]; then
+    BRANCH=$TRAVIS_BRANCH
+fi
+
+pattern="refactor_*"
+if [[ $BRANCH =~ $pattern ]]; then 
+    echo "Using refactored branch $BRANCH - fetching cothority"
+    repo=github.com/dedis/cothority
+    go get -d $repo
+    cd $GOPATH/src/$repo
+    git checkout -f $BRANCH
+    echo $(git rev-parse --abbrev-ref HEAD)
+fi
+echo "Using branch $BRANCH"
+
+cd $TRAVIS_BUILD_DIR
+go get -t ./...
+
+# Run test coverage on each subdirectories and merge the coverage profile.
 all_tests_passed=true
 
 echo "mode: atomic" > profile.cov

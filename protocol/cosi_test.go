@@ -8,7 +8,6 @@ import (
 	"github.com/dedis/cothority/network"
 	"github.com/dedis/cothority/sda"
 	"github.com/dedis/crypto/abstract"
-	"github.com/dedis/crypto/cosi"
 )
 
 func TestCosi(t *testing.T) {
@@ -17,7 +16,7 @@ func TestCosi(t *testing.T) {
 	for _, nbrHosts := range []int{1, 3, 13} {
 		log.Lvl2("Running cosi with", nbrHosts, "hosts")
 		local := sda.NewLocalTest()
-		hosts, el, tree := local.GenBigTree(nbrHosts, nbrHosts, 3, true, true)
+		hosts, el, tree := local.GenBigTree(nbrHosts, nbrHosts, 3, true)
 		aggPublic := network.Suite.Point().Null()
 		for _, e := range el.List {
 			aggPublic = aggPublic.Add(aggPublic, e.Public)
@@ -33,10 +32,10 @@ func TestCosi(t *testing.T) {
 		doneFunc := func(sig []byte) {
 			suite := hosts[0].Suite()
 			publics := el.Publics()
-			if err := root.cosi.VerifyResponses(aggPublic); err != nil {
+			if err := root.VerifyResponses(aggPublic); err != nil {
 				t.Fatal("Error verifying responses", err)
 			}
-			if err := cosi.VerifySignature(suite, publics, msg, sig); err != nil {
+			if err := VerifySignature(suite, publics, msg, sig); err != nil {
 				t.Fatal("Error verifying signature:", err)
 			}
 			done <- true

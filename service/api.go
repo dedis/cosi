@@ -31,8 +31,8 @@ func (c *Client) SignMsg(r *sda.Roster, msg []byte) (*SignatureResponse, error) 
 	dst := r.List[0]
 	log.Lvl4("Sending message to", dst)
 	reply, err := c.Send(dst, serviceReq)
-	if e := sda.ErrMsg(reply, err); e != nil {
-		return nil, e
+	if err != nil {
+		return nil, err
 	}
 	sr, ok := reply.Msg.(SignatureResponse)
 	if !ok {

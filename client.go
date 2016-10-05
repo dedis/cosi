@@ -31,8 +31,10 @@ func checkConfig(c *cli.Context) error {
 	f, err := os.Open(tomlFileName)
 	printErrAndExit("Couldn't open group definition file: %v", err)
 	group, err := config.ReadGroupDescToml(f)
+	log.Print("Size of group desc toml:", len(group.Roster.List))
 	printErrAndExit("Error while reading group definition file: %v", err)
 	err = server.CheckServers(group)
+	log.Print("server CheckServers err:", err)
 	return err
 }
 
