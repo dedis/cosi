@@ -7,11 +7,11 @@ package main
 import (
 	"time"
 
-	"gopkg.in/urfave/cli.v1"
-
 	"os"
 
+	"github.com/dedis/cothority/app/lib/server"
 	"github.com/dedis/cothority/log"
+	"gopkg.in/urfave/cli.v1"
 )
 
 // BinaryName represents the Name of the binary
@@ -135,7 +135,7 @@ func main() {
 						if c.GlobalIsSet("debug") {
 							stderrExit("[-] Debug option can't be used for the 'setup' command")
 						}
-						interactiveConfig()
+						server.InteractiveConfig(BinaryName)
 						return nil
 					},
 				},

@@ -13,11 +13,9 @@ import (
 	"os/user"
 	"path"
 	"runtime"
-	"strconv"
 	"strings"
 
 	c "github.com/dedis/cothority/app/lib/config"
-	"github.com/dedis/cothority/crypto"
 	"github.com/dedis/cothority/log"
 	"github.com/dedis/cothority/network"
 	"gopkg.in/urfave/cli.v1"
@@ -26,7 +24,6 @@ import (
 
 	_ "github.com/dedis/cosi/protocol"
 	_ "github.com/dedis/cosi/service"
-	"github.com/dedis/crypto/config"
 )
 
 func runServer(ctx *cli.Context) {
@@ -43,193 +40,6 @@ func runServer(ctx *cli.Context) {
 		log.Fatal("Couldn't parse config:", err)
 	}
 	conode.Start()
-}
-
-// interactiveConfig will ask through the command line to create a Private / Public
-// key, what is the listening address
-func interactiveConfig() {
-	fmt.Println("[+] Welcome ! Let's setup the configuration file for a CoSi server...")
-
-	fmt.Println("[*] We need to know on which [address:]PORT you want your server to listen to.")
-	fmt.Print("[*] Type <Enter> for default port " + strconv.Itoa(DefaultPort) + ": ")
-	reader := bufio.NewReader(os.Stdin)
-	var str = readString(reader)
-	// let's dissect the port / IP
-	var hostStr string
-	var ipProvided = true
-	var portStr string
-	var serverBinding network.Address
-	splitted := strings.Split(str, ":")
-
-	if str == "" {
-		portStr = strconv.Itoa(DefaultPort)
-		hostStr = "0.0.0.0"
-		ipProvided = false
-	} else if len(splitted) == 1 {
-		// one element provided
-		if _, err := strconv.Atoi(splitted[0]); err != nil {
-			stderrExit("[-] You have to provide a port number at least!")
-		}
-		// ip
-		ipProvided = false
-		hostStr = "0.0.0.0"
-		portStr = splitted[0]
-	} else if len(splitted) == 2 {
-		hostStr = splitted[0]
-		portStr = splitted[1]
-	}
-	// let's check if they are correct
-	serverBinding = network.NewTCPAddress(hostStr + ":" + portStr)
-	if !serverBinding.Valid() {
-		stderrExit("[-] Invalid connection information for %s", serverBinding)
-	}
-
-	fmt.Println("[+] We now need to get a reachable address for other CoSi servers")
-	fmt.Println("    and clients to contact you. This address will be put in a group definition")
-	fmt.Println("    file that you can share and combine with others to form a Cothority roster.")
-
-	var publicAddress network.Address
-	var failedPublic bool
-	// if IP was not provided then let's get the public IP address
-	if !ipProvided {
-		resp, err := http.Get("http://myexternalip.com/raw")
-		// cant get the public ip then ask the user for a reachable one
-		if err != nil {
-			stderr("[-] Could not get your public IP address")
-			failedPublic = true
-		} else {
-			buff, err := ioutil.ReadAll(resp.Body)
-			resp.Body.Close()
-			if err != nil {
-				stderr("[-] Could not parse your public IP address", err)
-				failedPublic = true
-			} else {
-				publicAddress = network.NewTCPAddress(strings.TrimSpace(string(buff)) + ":" + portStr)
-			}
-		}
-	} else {
-		publicAddress = serverBinding
-	}
-
-	// Let's directly ask the user for a reachable address
-	if failedPublic {
-		publicAddress = askReachableAddress(reader, portStr)
-	} else {
-		if publicAddress.Public() {
-			// try  to connect to ipfound:portgiven
-			tryIP := publicAddress
-			fmt.Println("[+] Check if the address", tryIP, "is reachable from Internet...")
-			if err := tryConnect(tryIP, serverBinding); err != nil {
-				stderr("[-] Could not connect to your public IP")
-				publicAddress = askReachableAddress(reader, portStr)
-			} else {
-				publicAddress = tryIP
-				fmt.Println("[+] Address", publicAddress, " publicly available from Internet!")
-			}
-		}
-	}
-
-	// create the keys
-	privStr, pubStr := createKeyPair()
-	conf := &c.CothoritydConfig{
-		Public:  pubStr,
-		Private: privStr,
-		Address: serverBinding,
-	}
-
-	var configDone bool
-	var configFolder string
-	var defaultFolder = path.Dir(getDefaultConfigFile())
-	var configFile string
-	var groupFile string
-
-	for !configDone {
-		// get name of config file and write to config file
-		fmt.Println("[*] We need a folder where to write the configuration files: " + DefaultServerConfig +
-			" and " + DefaultGroupFile + ".")
-		fmt.Print("[*] Type <Enter> to use the default folder [ " + defaultFolder + " ] :")
-		configFolder = readString(reader)
-		if configFolder == "" {
-			configFolder = defaultFolder
-		}
-		configFile = path.Join(configFolder, DefaultServerConfig)
-		groupFile = path.Join(configFolder, DefaultGroupFile)
-
-		// check if the directory exists
-		if _, err := os.Stat(configFolder); os.IsNotExist(err) {
-			fmt.Println("[+] Creating inexistant directory configuration", configFolder)
-			if err = os.MkdirAll(configFolder, 0744); err != nil {
-				stderrExit("[-] Could not create directory configuration %s %v", configFolder, err)
-			}
-		}
-
-		if checkOverwrite(configFile, reader) && checkOverwrite(groupFile, reader) {
-			break
-		}
-	}
-
-	public, err := crypto.ReadPubHex(network.Suite, pubStr)
-	if err != nil {
-		stderrExit("[-] Impossible to parse public key ? <internal error>")
-	}
-
-	server := c.NewServerToml(network.Suite, public, publicAddress)
-	group := c.NewGroupToml(server)
-
-	saveFiles(conf, configFile, group, groupFile)
-	fmt.Println("[+] We're done! Have good time using CoSi :)")
-}
-
-// Returns true if file exists and user is OK to overwrite, or file dont exists
-// Return false if file exists and user is NOT OK to overwrite.
-// stderrExit if stg is wrong
-func checkOverwrite(file string, reader *bufio.Reader) bool {
-	// check if the file exists and ask for override
-	if _, err := os.Stat(file); err == nil {
-		fmt.Print("[*] Configuration file " + file + " already exists. Override ? (y/n) : ")
-		var answer = readString(reader)
-		answer = strings.ToLower(answer)
-		if answer == "y" {
-			return true
-		} else if answer == "n" {
-			return false
-		} else {
-			stderrExit("[-] Could not interpret your response. Abort.")
-		}
-	}
-	return true
-}
-
-// createKeyPair returns the private and public key hexadecimal representation
-func createKeyPair() (string, string) {
-	fmt.Println("\n[+] Creation of the ed25519 private and public keys...")
-	kp := config.NewKeyPair(network.Suite)
-	privStr, err := crypto.ScalarHex(network.Suite, kp.Secret)
-	if err != nil {
-		stderrExit("[-] Error formating private key to hexadecimal. Abort.")
-	}
-	pubStr, err := crypto.PubHex(network.Suite, kp.Public)
-	if err != nil {
-		stderrExit("[-] Could not parse public key. Abort.")
-	}
-
-	fmt.Println("[+] Public key: ", pubStr)
-	return privStr, pubStr
-}
-
-func saveFiles(conf *c.CothoritydConfig, fileConf string, group *c.GroupToml, fileGroup string) {
-	if err := conf.Save(fileConf); err != nil {
-		stderrExit("[-] Unable to write the config to file:", err)
-	}
-	fmt.Println("[+] Sucess! You can now use the CoSi server with the config file", fileConf)
-	// group definition part
-	if err := group.Save(fileGroup); err != nil {
-		stderrExit("[-] Could not write your group file snippet: %v", err)
-	}
-
-	fmt.Println("[+] Saved a group definition snippet for your server at", fileGroup)
-	fmt.Println(group.String() + "\n")
-
 }
 
 func stderr(format string, a ...interface{}) {
