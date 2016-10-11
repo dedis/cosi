@@ -15,7 +15,7 @@ import (
 var Name = "CoSi"
 
 func init() {
-	sda.ProtocolRegisterName(Name, NewCoSi)
+	sda.GlobalProtocolRegister(Name, NewCoSi)
 }
 
 // This Cosi protocol is the simplest version, the "vanilla" version with the
@@ -45,7 +45,11 @@ type CoSi struct {
 	// the channel waiting for Response message
 	response chan chanResponse
 	// the channel that indicates if we are finished or not
-	done chan bool
+	doneCh chan bool
+	// boolean variable to check if we are already done or not
+	done bool
+	// mutex to access the done variable
+	doneMut sync.Mutex
 	// temporary buffer of commitment messages
 	tempCommitment []abstract.Point
 	// lock associated
@@ -104,7 +108,7 @@ func NewCoSi(node *sda.TreeNodeInstance) (sda.ProtocolInstance, error) {
 	c := &CoSi{
 		cosi:             cosi.NewCosi(node.Suite(), node.Private(), publics),
 		TreeNodeInstance: node,
-		done:             make(chan bool),
+		doneCh:           make(chan bool),
 		tempCommitLock:   new(sync.Mutex),
 		tempResponseLock: new(sync.Mutex),
 	}
@@ -139,7 +143,7 @@ func (c *CoSi) Dispatch() error {
 			err = c.handleChallenge(&packet.Challenge)
 		case packet := <-c.response:
 			err = c.handleResponse(&packet.Response)
-		case <-c.done:
+		case <-c.doneCh:
 			return nil
 		}
 		if err != nil {
@@ -234,11 +238,11 @@ func (c *CoSi) startChallenge() error {
 // results down the tree.
 func (c *CoSi) handleChallenge(in *Challenge) error {
 	log.Lvl3(c.Name(), "chal=", fmt.Sprintf("%+v", in.Chall))
-	c.cosi.Challenge(in.Chall)
-
 	if c.challengeHook != nil {
-		c.challengeHook(in.Chall)
+		return c.challengeHook(in.Chall)
 	}
+
+	c.cosi.Challenge(in.Chall)
 
 	// if we are leaf, then go to response
 	if c.IsLeaf() {
@@ -263,20 +267,20 @@ func (c *CoSi) handleResponse(in *Response) error {
 		}
 	}
 
-	defer func() {
-		// protocol is finished
-		close(c.done)
-		c.Done()
-	}()
+	// protocol is finished
+	defer c.Done()
+
+	if c.responseHook != nil {
+		log.Print(c.Name(), "Before responseHook")
+		c.responseHook(c.tempResponse)
+		log.Print(c.Name(), "After responseHook")
+		return nil
+	}
 
 	log.Lvl3(c.Name(), "aggregated")
 	outResponse, err := c.cosi.Response(c.tempResponse)
 	if err != nil {
 		return err
-	}
-
-	if c.responseHook != nil {
-		c.responseHook(c.tempResponse)
 	}
 
 	out := &Response{
@@ -293,6 +297,17 @@ func (c *CoSi) handleResponse(in *Response) error {
 		c.signatureHook(c.cosi.Signature())
 	}
 	return nil
+}
+
+func (c *CoSi) Done() {
+	c.doneMut.Lock()
+	defer c.doneMut.Unlock()
+	if c.done {
+		return
+	}
+	c.done = true
+	close(c.doneCh)
+	c.TreeNodeInstance.Done()
 }
 
 // VerifyResponses allows to check at each intermediate node whether the
