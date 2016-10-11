@@ -7,7 +7,6 @@ import (
 	"github.com/dedis/cothority/log"
 	"github.com/dedis/cothority/network"
 	"github.com/dedis/cothority/sda"
-	"github.com/dedis/crypto/abstract"
 )
 
 func TestCosi(t *testing.T) {
@@ -30,6 +29,7 @@ func TestCosi(t *testing.T) {
 		var root *CoSi
 		// function that will be called when protocol is finished by the root
 		doneFunc := func(sig []byte) {
+			log.Lvl1("Got Signature")
 			suite := hosts[0].Suite()
 			publics := el.Publics()
 			if err := root.VerifyResponses(aggPublic); err != nil {
@@ -48,13 +48,6 @@ func TestCosi(t *testing.T) {
 		}
 		root = p.(*CoSi)
 		root.Message = msg
-		responseFunc := func(in []abstract.Scalar) {
-			log.Lvl1("Got response")
-			if len(root.Children()) != len(in) {
-				t.Fatal("Didn't get same number of responses")
-			}
-		}
-		root.RegisterResponseHook(responseFunc)
 		root.RegisterSignatureHook(doneFunc)
 		go root.StartProtocol()
 		select {

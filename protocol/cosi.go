@@ -271,9 +271,7 @@ func (c *CoSi) handleResponse(in *Response) error {
 	defer c.Done()
 
 	if c.responseHook != nil {
-		log.Print(c.Name(), "Before responseHook")
 		c.responseHook(c.tempResponse)
-		log.Print(c.Name(), "After responseHook")
 		return nil
 	}
 
