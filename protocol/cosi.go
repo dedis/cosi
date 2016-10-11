@@ -15,7 +15,7 @@ import (
 var Name = "CoSi"
 
 func init() {
-	sda.ProtocolRegisterName(Name, NewCoSi)
+	sda.GlobalProtocolRegister(Name, NewCoSi)
 }
 
 // This Cosi protocol is the simplest version, the "vanilla" version with the
