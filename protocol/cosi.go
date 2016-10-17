@@ -69,7 +69,7 @@ type CoSi struct {
 
 // AnnouncementHook allows for handling what should happen upon an
 // announcement
-type AnnouncementHook func() error
+type AnnouncementHook func(in *Announcement) error
 
 // CommitmentHook allows for handling what should happen when all
 // commitments are received
@@ -173,7 +173,7 @@ func (c *CoSi) handleAnnouncement(in *Announcement) error {
 	log.Lvl3("Message:", c.Message)
 	// If we have a hook on announcement call the hook
 	if c.announcementHook != nil {
-		return c.announcementHook()
+		return c.announcementHook(in)
 	}
 
 	// If we are leaf, we should go to commitment
