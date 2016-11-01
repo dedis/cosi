@@ -147,7 +147,7 @@ func (c *CoSi) Dispatch() error {
 			return nil
 		}
 		if err != nil {
-			log.Error("ProtocolCosi -> err treating incoming:", err)
+			log.Error(c.Name(), "err treating incoming:", err)
 		}
 	}
 }
@@ -270,12 +270,12 @@ func (c *CoSi) handleResponse(in *Response) error {
 	// protocol is finished
 	defer c.Done()
 
+	log.Lvl3(c.Name(), "aggregated")
 	if c.responseHook != nil {
 		c.responseHook(c.tempResponse)
 		return nil
 	}
 
-	log.Lvl3(c.Name(), "aggregated")
 	outResponse, err := c.cosi.Response(c.tempResponse)
 	if err != nil {
 		return err
