@@ -64,6 +64,7 @@ type CoSi struct {
 	commitmentHook   CommitmentHook
 	challengeHook    ChallengeHook
 	responseHook     ResponseHook
+	responseHookRet  bool
 	signatureHook    SignatureHook
 }
 
@@ -271,7 +272,7 @@ func (c *CoSi) handleResponse(in *Response) error {
 	defer c.Done()
 
 	log.Lvl3(c.Name(), "aggregated")
-	if c.responseHook != nil {
+	if c.responseHook != nil && c.responseHookRet {
 		c.responseHook(c.tempResponse)
 		return nil
 	}
@@ -283,6 +284,10 @@ func (c *CoSi) handleResponse(in *Response) error {
 
 	out := &Response{
 		Resp: outResponse,
+	}
+
+	if c.responseHook != nil {
+		c.responseHook(c.tempResponse)
 	}
 
 	// send it back to parent
@@ -339,8 +344,12 @@ func (c *CoSi) RegisterChallengeHook(fn ChallengeHook) {
 }
 
 // RegisterResponseHook allows for handling what should happen when a
-// response is received
-func (c *CoSi) RegisterResponseHook(fn ResponseHook) {
+// response is received.
+// If ret is true, the responsehook also does the sending of the message
+// to the parent. If ret is false, CoSi will take care of sending the
+// message to the parent.
+func (c *CoSi) RegisterResponseHook(fn ResponseHook, ret bool) {
+	c.responseHookRet = ret
 	c.responseHook = fn
 }
 
