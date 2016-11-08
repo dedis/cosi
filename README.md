@@ -107,7 +107,7 @@ and make sure that
 Then you can fetch, update, compile and install the cosi-binary using:
 
 ```bash
-go get -u github.com/dedis/cosi
+go get -u github.com/dedis/cothority/app/cosi
 ```
 
 The `cosi` binary will be installed in the directory indicated by `$GOBIN`.
@@ -126,7 +126,7 @@ where you can find the following files: `README.md` and `dedis-group.toml`.
 If you compiled from source, please change the directory like so:
 
 ```bash
-cd $GOPATH/src/github.com/dedis/cosi
+cd $GOPATH/src/github.com/dedis/cothority/app/cosi/
 ```
 
 If you used the binary distribution, please use
