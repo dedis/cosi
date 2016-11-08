@@ -73,6 +73,9 @@ go get -u -t ./...
 
 from time to time, as all dedis-dependencies change quite often.
 
+*Update:* CoSi development and its master branch is continued in in the
+[cothority repository](ttps://github.com/dedis/cothority/).
+
 # Installation
 
 You may install CoSi from either pre-built binaries
