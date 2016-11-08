@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/dedis/cosi.svg?branch=master)](https://travis-ci.org/dedis/cosi)
-[![Coverage Status](https://coveralls.io/repos/github/dedis/cosi/badge.svg?branch=master)](https://coveralls.io/github/dedis/cosi?branch=master)
+[![Build Status](https://travis-ci.org/dedis/cothority.svg?branch=master)](https://travis-ci.org/dedis/cothority)
+[![Coverage Status](https://coveralls.io/repos/github/dedis/cothority/badge.svg?branch=master)](https://coveralls.io/github/dedis/costhority?branch=master)
 
 
 # CoSi
