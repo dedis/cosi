@@ -4,7 +4,9 @@
 
 # CoSi
 
-This repository implements the CoSi protocol for scalable collective signing.
+This repository [points](https://github.com/dedis/cothority/tree/master/app/cosi) 
+to an implementation of the CoSi protocol for 
+scalable collective signing.
 CoSi enables authorities to have their statements collectively signed,
 or *co-signed*, by a scalable group of independent parties or *witnesses*.
 The signatures that CoSi produces convey the same information
@@ -20,7 +22,7 @@ for critical Internet authorities such as certificate authorities,
 naming authorities such as [DNSSEC](http://www.dnssec.net),
 software distribution and update services,
 directory services used by tools such as [Tor](https://www.torproject.org),
-and next-generation cryptocurrencies.
+and next-generation crypto-currencies.
 For further background and technical details see this research paper:
 * [Keeping Authorities "Honest or Bust" with Decentralized Witness Cosigning](http://dedis.cs.yale.edu/dissent/papers/witness-abs), 
 [IEEE Security & Privacy 2016](http://www.ieee-security.org/TC/SP2016/).
@@ -42,11 +44,15 @@ Use at your own risk!**
 
 # Versions
 
-For the moment we have two version: _v0_ and _master_.
+For the moment we have two version: _v0_ (this repo) and _master_ 
+(whose development continues in the 
+[cothority repository](https://github.com/dedis/cothority/)).
 
 ## V0
 
-This is a stable version that depends on the v0-versions of the other dedis-packages. It will only receive bugfixes, but no changes that will make the code incompatible. You can find this version at:
+This is a stable version that depends on the v0-versions of the other dedis-packages. 
+It will only receive bugfixes, but no changes that will make the code incompatible. 
+You can find this version at:
 
 https://github.com/dedis/cosi/tree/v0
 
