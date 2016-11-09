@@ -4,9 +4,14 @@
 
 # CoSi
 
-This repository [points](https://github.com/dedis/cothority/tree/master/app/cosi) 
-to an implementation of the CoSi protocol for 
-scalable collective signing.
+**Update: Development of CoSi moved to the 
+[cothority](https://github.com/dedis/cothority/) repository. 
+This repository only contains the first unstable 
+[`v0` branch](https://gopkg.in/dedis/cosi.v0) and some outdated 
+[releases](https://github.com/dedis/cosi/releases). 
+For future development and releases please have a look at the
+[cothority repository](https://github.com/dedis/cothority/).**
+
 CoSi enables authorities to have their statements collectively signed,
 or *co-signed*, by a scalable group of independent parties or *witnesses*.
 The signatures that CoSi produces convey the same information
@@ -62,20 +67,6 @@ If you write code that uses our library in the v0-version, be sure to reference 
 import "gopkg.in/dedis/cosi.v0"
 ```
 
-## Master
-
-The master-branch is used for day-to-day development and will break your 
-code about once a week. If you are using this branch, be sure to do
-
-```
-go get -u -t ./...
-```
-
-from time to time, as all dedis-dependencies change quite often.
-
-*Update:* CoSi development and its master branch is continued in in the
-[cothority repository](ttps://github.com/dedis/cothority/).
-
 # Installation
 
 You may install CoSi from either pre-built binaries
@@ -97,23 +88,6 @@ tar xf cosi-*tar.gz -C ~/bin
 ```
 
 Now you can go on directly to *Command-line Interface*
-
-## Installing from Source
-
-To build and run CoSi from source code you will need to install
-[Go](https://golang.org/) version 1.5.2 or later.
-See
-[the Go documentation](https://golang.org/doc/install)
-on how to install and configure Go,
-and make sure that
-[`$GOPATH` and `$GOBIN` are set](https://golang.org/doc/code.html#GOPATH).
-Then you can fetch, update, compile and install the cosi-binary using:
-
-```bash
-go get -u github.com/dedis/cothority/app/cosi
-```
-
-The `cosi` binary will be installed in the directory indicated by `$GOBIN`.
 
 # Command-line Interface
 
