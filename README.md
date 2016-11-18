@@ -47,20 +47,9 @@ Other related papers:
 
 # Versions
 
-For the moment we have two version: _v0_ (this repo) and _master_. 
-CoSi development continues in the 
-[cothority repository](https://github.com/dedis/cothority/).
-
-## V0
-
-This is a stable version that depends on the v0-versions of the other dedis-packages. 
-It will only receive bugfixes, but no changes that will make the code incompatible. 
-You can find this version at:
-
-https://github.com/dedis/cosi/tree/v0
-
-Find more information on installing and using the _v0_ release 
-in the _v0_ [documentation](https://github.com/dedis/cosi/blob/v0/README.md).
+For the moment we have two version: [`v0`](https://github.com/dedis/cosi/tree/v0) 
+and the [master-branch](https://github.com/dedis/cothority/) of the 
+cothority-repository, where development continues.
 
 # Standalone Language-specific Verification/Signing Modules
 
