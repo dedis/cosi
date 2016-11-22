@@ -13,15 +13,15 @@ import (
 
 	"fmt"
 
+	"gopkg.in/codegangsta/cli.v1"
 	"gopkg.in/dedis/cosi.v0/lib"
 	s "gopkg.in/dedis/cosi.v0/service"
-	"gopkg.in/dedis/crypto.v0/abstract"
-	"gopkg.in/codegangsta/cli.v1"
 	"gopkg.in/dedis/cothority.v0/lib/config"
 	"gopkg.in/dedis/cothority.v0/lib/crypto"
 	"gopkg.in/dedis/cothority.v0/lib/dbg"
 	"gopkg.in/dedis/cothority.v0/lib/network"
 	"gopkg.in/dedis/cothority.v0/lib/sda"
+	"gopkg.in/dedis/crypto.v0/abstract"
 )
 
 // checkConfig contacts all servers and verifies if it receives a valid
