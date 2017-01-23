@@ -80,7 +80,7 @@ in the CoSi protocol.
 
 ## Chose the Right Directory for the Examples
 
-** This does not work anymore, as the CoSi-servers are not running anymore **
+**This does not work anymore, as the CoSi-servers are not running anymore**
 
 For the examples in the following sections, we suppose you're in a directory
 where you can find the following files: `README.md` and `dedis-group.toml`.
@@ -99,7 +99,7 @@ cd $( dirname $( which cosi ) )
 
 ## Collectively Signing Messages with the CoSi Client
 
-** This does not work anymore, as the CoSi-servers are not running anymore **
+**This does not work anymore, as the CoSi-servers are not running anymore**
 
 In order to sign messages collectively, you first need to define the set of
 cosigners that will participate.  To do this, you need to prepare a *group definition* 
@@ -149,7 +149,7 @@ by which the servers can apply application-specific checks to messages
 before signing off on them,
 e.g., to validate a [collectively signed blockchain](http://arxiv.org/abs/1602.06997).
 
-** This does not work anymore, as the CoSi-servers are not running anymore **
+**This does not work anymore, as the CoSi-servers are not running anymore**
 
 ## Running Your Own CoSi Witness Server
 
